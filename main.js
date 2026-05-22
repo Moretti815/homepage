@@ -71,47 +71,26 @@ const ongoingProject = {
   forks: 0,
 };
 
-// 从环境变量读取配置（支持 Vite/Node.js 环境变量或全局变量）
-// 使用方式：在 .env 文件中定义，或在部署平台设置环境变量
-const ENV =
-  typeof import.meta !== "undefined" && import.meta.env ? import.meta.env : {};
+// 从环境变量读取配置（Vite 环境变量）
+// 使用方式：在 .env 文件中定义 VITE_ 前缀的变量，或在部署平台设置环境变量
+const ENV = import.meta.env;
 
 // GitHub API配置
-const GITHUB_USERNAME =
-  ENV.VITE_GITHUB_USERNAME ||
-  ENV.GITHUB_USERNAME ||
-  window.GITHUB_USERNAME ||
-  "yuazhi";
+const GITHUB_USERNAME = ENV.VITE_GITHUB_USERNAME || "yuazhi";
 const GITHUB_API_BASE = "https://api.github.com";
-const GITHUB_TOKEN =
-  ENV.VITE_GITHUB_TOKEN || ENV.GITHUB_TOKEN || window.GITHUB_TOKEN || "#";
+const GITHUB_TOKEN = ENV.VITE_GITHUB_TOKEN || "#";
 
 // Memos API配置
-const MEMOS_API_BASE =
-  ENV.VITE_MEMOS_API_BASE || ENV.MEMOS_API_BASE || window.MEMOS_API_BASE || "#";
-const MEMOS_TOKEN =
-  ENV.VITE_MEMOS_TOKEN || ENV.MEMOS_TOKEN || window.MEMOS_TOKEN || "#";
-const MEMOS_RESOURCE_BASE =
-  ENV.VITE_MEMOS_RESOURCE_BASE ||
-  ENV.MEMOS_RESOURCE_BASE ||
-  window.MEMOS_RESOURCE_BASE ||
-  "";
+const MEMOS_API_BASE = ENV.VITE_MEMOS_API_BASE || "#";
+const MEMOS_TOKEN = ENV.VITE_MEMOS_TOKEN || "#";
+const MEMOS_RESOURCE_BASE = ENV.VITE_MEMOS_RESOURCE_BASE || "";
 
 // 说说 API 配置（tgtalk）
-const TGTALK_API_URL =
-  ENV.VITE_TGTALK_API_URL || ENV.TGTALK_API_URL || window.TGTALK_API_URL || "#";
+const TGTALK_API_URL = ENV.VITE_TGTALK_API_URL || "#";
 
 // 文章 API 配置
-const ARTICLES_API_URL =
-  ENV.VITE_ARTICLES_API_URL ||
-  ENV.ARTICLES_API_URL ||
-  window.ARTICLES_API_URL ||
-  "#";
-const ARTICLES_API_METHOD =
-  ENV.VITE_ARTICLES_API_METHOD ||
-  ENV.ARTICLES_API_METHOD ||
-  window.ARTICLES_API_METHOD ||
-  "post";
+const ARTICLES_API_URL = ENV.VITE_ARTICLES_API_URL || "#";
+const ARTICLES_API_METHOD = ENV.VITE_ARTICLES_API_METHOD || "post";
 
 const ARTICLES_API_CONFIG = {
   URL: ARTICLES_API_URL,
