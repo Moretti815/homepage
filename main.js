@@ -264,6 +264,7 @@ async function fetchFriendsData() {
         snapshot: item.snapshot,
         feed: item.feed,
         posts: item.posts || [],
+        labels: item.labels || [],
       }));
     } else {
       throw new Error("API返回数据格式错误");
