@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
       - name: Checkout
@@ -20,8 +21,15 @@ jobs:
           node-version: '22'
           cache: 'npm'
           
+      - name: Configure npm registry
+        run: |
+          npm config set registry https://registry.npmmirror.com
+          npm config set fetch-retries 3
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 60000
+          
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit --no-fund
         
       - name: Build
         env:
@@ -40,6 +48,9 @@ jobs:
           VITE_SITE_TITLE: ${{ secrets.VITE_SITE_TITLE }}
           VITE_SITE_DESCRIPTION: ${{ secrets.VITE_SITE_DESCRIPTION }}
           VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
+          # 社交链接配置
+          VITE_EMAIL: ${{ secrets.VITE_EMAIL }}
+          VITE_TWITTER_USERNAME: ${{ secrets.VITE_TWITTER_USERNAME }}
         run: npm run build
         
       - name: Upload build artifact
