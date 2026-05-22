@@ -834,34 +834,50 @@ async function fetchContributionData(
         let allEvents = [];
         let page = 1;
         let hasMorePages = true;
-        const maxPages = 20; // 增加最大获取页数，确保获取足够的事件
+        const maxPages = 3; // GitHub API 限制，最多获取 300 个事件 (3页 x 100)
 
         while (hasMorePages && page <= maxPages) {
-          const response = await fetch(
-            `https://api.github.com/users/${GITHUB_USERNAME}/events?per_page=100&page=${page}`,
-            { headers },
-          );
-
-          if (!response.ok) {
-            throw new Error(`GitHub API error: ${response.status}`);
-          }
-
-          const events = await response.json();
-
-          if (events.length === 0) {
-            hasMorePages = false;
-          } else {
-            allEvents = [...allEvents, ...events];
-
-            // 检查最后一个事件的日期是否早于我们需要的年份
-            const lastEventDate = new Date(
-              events[events.length - 1].created_at,
+          try {
+            const response = await fetch(
+              `https://api.github.com/users/${GITHUB_USERNAME}/events?per_page=100&page=${page}`,
+              { headers },
             );
-            if (lastEventDate < startDate) {
-              hasMorePages = false;
+
+            if (!response.ok) {
+              if (response.status === 422) {
+                // 422 表示没有更多页面了
+                console.log(
+                  `GitHub Events API 返回 422，停止获取 (page=${page})`,
+                );
+                hasMorePages = false;
+                break;
+              }
+              throw new Error(`GitHub API error: ${response.status}`);
             }
 
-            page++;
+            const events = await response.json();
+
+            if (events.length === 0) {
+              hasMorePages = false;
+            } else {
+              allEvents = [...allEvents, ...events];
+
+              // 检查最后一个事件的日期是否早于我们需要的年份
+              const lastEventDate = new Date(
+                events[events.length - 1].created_at,
+              );
+              if (lastEventDate < startDate) {
+                hasMorePages = false;
+              }
+
+              page++;
+            }
+          } catch (error) {
+            console.warn(
+              `获取 GitHub Events 第 ${page} 页失败:`,
+              error.message,
+            );
+            hasMorePages = false;
           }
         }
 
