@@ -1,3 +1,6 @@
+// 导入 marked 用于 Markdown 渲染
+import { marked } from "marked";
+
 // 模拟项目数据，实际使用时可以替换为真实的API请求
 // 添加 normalizeLangName 函数定义
 function normalizeLangName(name) {
@@ -3250,9 +3253,11 @@ async function showProjectDetail(projectName) {
         `;
 
     // 初始化代码高亮
-    modal.querySelectorAll("pre code").forEach((block) => {
-      hljs.highlightElement(block);
-    });
+    if (typeof hljs !== "undefined" && hljs.highlightElement) {
+      modal.querySelectorAll("pre code").forEach((block) => {
+        hljs.highlightElement(block);
+      });
+    }
   } catch (error) {
     console.error("Error loading project details:", error);
     modal.querySelector(".project-modal-body").innerHTML = `
@@ -4375,6 +4380,9 @@ async function switchMemoType(type) {
   }
 }
 
+// 将函数暴露到全局，以便 onclick 可以调用
+window.switchMemoType = switchMemoType;
+
 // 渲染 Memos 内容
 async function renderMemosContent(container) {
   try {
@@ -4848,7 +4856,10 @@ async function showArticleDetail(article) {
   if (articleContent) {
     articleModal.querySelector(".article-modal-body").innerHTML =
       articleContent;
-    hljs.highlightAll();
+    // 初始化代码高亮
+    if (typeof hljs !== "undefined" && hljs.highlightAll) {
+      hljs.highlightAll();
+    }
   } else {
     console.error("文章内容为空或无法找到 'text' 或 'content' 字段:", article);
     articleModal.querySelector(".article-modal-body").innerHTML =

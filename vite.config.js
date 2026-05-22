@@ -1,14 +1,14 @@
-import { defineConfig } from "vite";
-import { resolve } from "path";
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
   // 项目根目录
-  root: ".",
+  root: '.',
 
   // 构建配置
   build: {
     // 输出目录
-    outDir: "dist",
+    outDir: 'dist',
 
     // 清空输出目录
     emptyOutDir: true,
@@ -20,7 +20,7 @@ export default defineConfig({
     cssCodeSplit: true,
 
     // 压缩选项
-    minify: "terser",
+    minify: 'terser',
 
     // 源映射（生产环境关闭）
     sourcemap: false,
@@ -28,24 +28,26 @@ export default defineConfig({
     // Rollup 选项
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
+        main: resolve(__dirname, 'index.html'),
       },
-      // 外部依赖（不打包这些库）
+      // 外部依赖（不打包这些库，保持 CDN 加载）
       external: [],
       output: {
         // 入口文件
-        entryFileNames: "assets/[name]-[hash].js",
+        entryFileNames: 'assets/[name]-[hash].js',
         // 代码分割块
-        chunkFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: 'assets/[name]-[hash].js',
         // 资源文件
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split(".");
+          const info = assetInfo.name.split('.');
           const ext = info[info.length - 1];
           if (/\.(css)$/i.test(assetInfo.name)) {
-            return "assets/[name]-[hash][extname]";
+            return 'assets/[name]-[hash][extname]';
           }
-          return "assets/[name]-[hash][extname]";
+          return 'assets/[name]-[hash][extname]';
         },
+        // 引入全局变量
+        intro: 'window.hljs = window.hljs || {};',
       },
     },
   },
@@ -63,12 +65,12 @@ export default defineConfig({
   },
 
   // 环境变量前缀（只有以 VITE_ 开头的变量才会暴露给客户端）
-  envPrefix: "VITE_",
+  envPrefix: 'VITE_',
 
   // 路径别名
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./"),
+      '@': resolve(__dirname, './'),
     },
   },
 
@@ -79,6 +81,11 @@ export default defineConfig({
 
   // 优化依赖
   optimizeDeps: {
-    exclude: ["highlight.min.js", "chart.js", "marked.min.js"],
+    exclude: ['highlight.min.js', 'chart.js', 'marked.min.js'],
+  },
+
+  // 定义全局变量
+  define: {
+    'window.hljs': 'window.hljs',
   },
 });
