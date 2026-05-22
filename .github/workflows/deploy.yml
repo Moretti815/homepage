@@ -24,6 +24,25 @@ jobs:
         run: npm ci
         
       - name: Build
+        env:
+          # GitHub API 配置
+          VITE_GITHUB_USERNAME: ${{ secrets.VITE_GITHUB_USERNAME }}
+          VITE_GITHUB_TOKEN: ${{ secrets.VITE_GITHUB_TOKEN }}
+          # Memos API 配置
+          VITE_MEMOS_API_BASE: ${{ secrets.VITE_MEMOS_API_BASE }}
+          VITE_MEMOS_TOKEN: ${{ secrets.VITE_MEMOS_TOKEN }}
+          # Tgtalk API 配置
+          VITE_TGTALK_API_URL: ${{ secrets.VITE_TGTALK_API_URL }}
+          # 文章 API 配置
+          VITE_ARTICLES_API_URL: ${{ secrets.VITE_ARTICLES_API_URL }}
+          VITE_ARTICLES_API_METHOD: ${{ secrets.VITE_ARTICLES_API_METHOD }}
+          # 网站基础配置
+          VITE_SITE_TITLE: ${{ secrets.VITE_SITE_TITLE }}
+          VITE_SITE_DESCRIPTION: ${{ secrets.VITE_SITE_DESCRIPTION }}
+          VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
+          # 社交链接配置
+          VITE_EMAIL: ${{ secrets.VITE_EMAIL }}
+          VITE_TWITTER_USERNAME: ${{ secrets.VITE_TWITTER_USERNAME }}
         run: npm run build
         
       - name: Upload build artifact
