@@ -4700,6 +4700,173 @@ margin-left: auto; /* 保持靠右 */
     color: #0366d6; /* Blue color for inline tags */
 }
 
+/* ============================================
+   Memos Tab 切换样式
+   ============================================ */
+
+.memos-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 4px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.memos-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.memos-tab:hover {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.memos-tab.active {
+    background-color: var(--card-bg);
+    color: var(--link-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.memos-tab svg {
+    opacity: 0.7;
+}
+
+.memos-tab.active svg {
+    opacity: 1;
+}
+
+.memos-content-wrapper {
+    min-height: 200px;
+}
+
+/* ============================================
+   说说 (Tgtalk) 样式
+   ============================================ */
+
+.tgtalk-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tgtalk-card {
+    padding: 16px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.tgtalk-card .memo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.tgtalk-card .memo-views {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.tgtalk-content {
+    line-height: 1.6;
+}
+
+.tgtalk-content p {
+    margin-bottom: 8px;
+}
+
+.tgtalk-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* 说说图片样式 - 限制大小 */
+.tgtalk-resources {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tgtalk-image {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.tgtalk-image:hover {
+    transform: scale(1.02);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .memos-tabs {
+        padding: 3px;
+    }
+
+    .memos-tab {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .tgtalk-resources {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tgtalk-image {
+        max-width: 100%;
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .memos-tab {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .memos-tab svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .tgtalk-resources {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .tgtalk-image {
+        max-height: 120px;
+    }
+}
+
+/* 暗色模式 */
+[data-theme="dark"] .memos-tab.active {
+    background-color: var(--bg-secondary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 /* 灯箱样式 */
 .lightbox {
     display: none;
