@@ -5315,6 +5315,46 @@ margin-left: auto; /* 保持靠右 */
     }
 }
 
+/* 友链延迟状态标签样式 */
+.status-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4px 10px;
+    border-radius: 12px 0 12px 0;
+    font-size: 11px;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 10;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.friend-card:hover .status-tag {
+    opacity: 0;
+    transform: translateY(-5px);
+}
+
+/* 延迟状态颜色 */
+.status-tag-green {
+    background-color: #238636; /* GitHub 绿色 */
+}
+
+.status-tag-light-yellow {
+    background-color: #d29922; /* GitHub 黄色 */
+}
+
+.status-tag-dark-yellow {
+    background-color: #f0883e; /* GitHub 橙色 */
+}
+
+.status-tag-red {
+    background-color: #da3633; /* GitHub 红色 */
+}
+
 /* 网站基本信息样式 */
 .site-info {
     margin-top: 2rem;

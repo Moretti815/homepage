@@ -1,6 +1,20 @@
 // 导入 marked 用于 Markdown 渲染
 import { marked } from "marked";
 
+// 配置 marked 选项，禁用 emoji 转图片
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+  headerIds: false,
+  mangle: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  xhtml: false,
+  // 禁用 emoji 转图片
+  emoji: false,
+});
+
 // 模拟项目数据，实际使用时可以替换为真实的API请求
 // 添加 normalizeLangName 函数定义
 function normalizeLangName(name) {
@@ -229,23 +243,120 @@ async function fetchArticlesData() {
   }
 }
 
-// 获取友情链接数据
+// 获取友情链接数据（使用新的 API）
 async function fetchFriendsData() {
   try {
-    const response = await fetch("api/friends-api.json");
+    const response = await fetch(
+      "https://jsd.268682.xyz/gh/Kemeow0815/friends@output/v2/data.json",
+    );
     if (!response.ok) {
       throw new Error(`Failed to fetch friends data: ${response.status}`);
     }
     const result = await response.json();
-    if (result.status === "success") {
-      return result.data;
+    // 新的 API 格式：{ version: "v2", content: [...] }
+    if (result.content && Array.isArray(result.content)) {
+      // 转换数据格式以适配现有渲染逻辑
+      return result.content.map((item) => ({
+        name: item.title,
+        url: item.url,
+        avatar: item.icon,
+        description: item.description,
+        snapshot: item.snapshot,
+        feed: item.feed,
+        posts: item.posts || [],
+      }));
     } else {
-      throw new Error(result.message || "API返回错误状态");
+      throw new Error("API返回数据格式错误");
     }
   } catch (error) {
     console.error("Error fetching friends data:", error);
     throw error;
   }
+}
+
+// 获取友链延迟状态数据
+async function fetchLinkStatusData() {
+  try {
+    const cacheKey = "linkStatusData";
+    const cacheExpirationTime = 30 * 60 * 1000; // 半小时缓存
+
+    // 检查缓存
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (Date.now() - timestamp < cacheExpirationTime) {
+        return data;
+      }
+    }
+
+    // 获取新数据
+    const response = await fetch("https://clink.268682.xyz/result.json");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch link status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    // 缓存数据
+    const cacheData = {
+      data: data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching link status data:", error);
+    return null;
+  }
+}
+
+// 应用延迟状态标签到友链卡片
+function applyLinkStatusTags(linkStatusData) {
+  if (!linkStatusData || !linkStatusData.link_status) return;
+
+  const linkStatus = linkStatusData.link_status;
+
+  document.querySelectorAll(".friend-card").forEach((card) => {
+    if (!card.href) return;
+
+    const link = card.href.replace(/\/$/, "");
+    const status = linkStatus.find(
+      (item) => item.link.replace(/\/$/, "") === link,
+    );
+
+    if (status) {
+      let latencyText = "未知";
+      let className = "status-tag-red"; // 默认红色
+
+      if (status.latency === -1) {
+        latencyText = "未知";
+      } else {
+        const latencyMs = status.latency * 1000; // 转换为毫秒
+        latencyText = Math.round(latencyMs) + " MS";
+
+        if (status.latency <= 2) {
+          className = "status-tag-green";
+        } else if (status.latency <= 5) {
+          className = "status-tag-light-yellow";
+        } else if (status.latency <= 10) {
+          className = "status-tag-dark-yellow";
+        }
+      }
+
+      const statusTag = document.createElement("div");
+      statusTag.className = `status-tag ${className}`;
+      statusTag.innerHTML = `
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" style="margin-right: 4px;">
+          <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm0-1A7 7 0 1 0 8 1a7 7 0 0 0 0 14z"/>
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3.5a.5.5 0 0 1-.5-.5v-3.5A.5.5 0 0 1 8 4z"/>
+        </svg>
+        ${latencyText}
+      `;
+
+      card.style.position = "relative";
+      card.appendChild(statusTag);
+    }
+  });
 }
 
 // 复制内容到剪贴板
@@ -346,6 +457,12 @@ async function renderFriends() {
     // 更新到最后一步：完成加载
     await updateLoadingStep();
     hideSkeletonLoading();
+
+    // 获取并应用延迟状态标签
+    const linkStatusData = await fetchLinkStatusData();
+    if (linkStatusData) {
+      applyLinkStatusTags(linkStatusData);
+    }
   } catch (error) {
     // 如果API调用失败，显示错误信息
     contentArea.innerHTML = `
@@ -3818,6 +3935,24 @@ function processTgtalkContent(text) {
 
   // 将 <br/> 和 <br> 转换为换行符
   processed = processed.replace(/<br\s*\/?>/gi, "\n");
+
+  // 移除 emoji 图片（保留原始 emoji 字符）
+  // 匹配常见的 emoji 图片标签
+  processed = processed.replace(/<img[^>]*class="emoji"[^>]*>/gi, "");
+  processed = processed.replace(
+    /<img[^>]*alt="([^"]*)"[^>]*>/gi,
+    (match, alt) => {
+      // 如果 alt 是 emoji，保留 alt 文本
+      if (
+        /^[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]$/u.test(
+          alt,
+        )
+      ) {
+        return alt;
+      }
+      return match;
+    },
+  );
 
   // 使用 marked 解析 Markdown
   processed = marked.parse(processed);
