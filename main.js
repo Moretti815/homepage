@@ -313,19 +313,43 @@ async function fetchLinkStatusData() {
 
 // 应用延迟状态标签到友链卡片
 function applyLinkStatusTags(linkStatusData) {
-  if (!linkStatusData || !linkStatusData.link_status) return;
+  if (!linkStatusData || !linkStatusData.link_status) {
+    console.log("No link status data available");
+    return;
+  }
 
   const linkStatus = linkStatusData.link_status;
+  console.log("Applying link status tags, total:", linkStatus.length);
 
   document.querySelectorAll(".friend-card").forEach((card) => {
     // 使用 data-link 属性或 href 属性
     const cardLink = card.dataset.link || card.href;
-    if (!cardLink) return;
+    if (!cardLink) {
+      console.log("Card has no link");
+      return;
+    }
 
-    const link = cardLink.replace(/\/$/, "");
-    const status = linkStatus.find(
-      (item) => item.link.replace(/\/$/, "") === link,
-    );
+    // 标准化链接：移除协议和尾部斜杠
+    const normalizeUrl = (url) => {
+      return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    };
+
+    const normalizedCardLink = normalizeUrl(cardLink);
+    console.log("Looking for match:", normalizedCardLink);
+
+    const status = linkStatus.find((item) => {
+      const normalizedItemLink = normalizeUrl(item.link);
+      const match = normalizedItemLink === normalizedCardLink;
+      if (match) {
+        console.log(
+          "Found match:",
+          normalizedItemLink,
+          "latency:",
+          item.latency,
+        );
+      }
+      return match;
+    });
 
     if (status) {
       let latencyText = "未知";
@@ -358,6 +382,9 @@ function applyLinkStatusTags(linkStatusData) {
 
       card.style.position = "relative";
       card.appendChild(statusTag);
+      console.log("Added status tag to card:", normalizedCardLink);
+    } else {
+      console.log("No status found for:", normalizedCardLink);
     }
   });
 }
