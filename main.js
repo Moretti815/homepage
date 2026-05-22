@@ -5436,6 +5436,10 @@ function hideContributionTooltip() {
   }
 }
 
+// 将函数暴露到全局，以便 HTML 事件可以调用
+window.showContributionTooltip = showContributionTooltip;
+window.hideContributionTooltip = hideContributionTooltip;
+
 // 检测是否为移动设备
 function isMobileDevice() {
   return (
