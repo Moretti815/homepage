@@ -4301,6 +4301,9 @@ function toggleTheme() {
   localStorage.setItem("theme", newTheme);
 }
 
+// 将 toggleTheme 暴露到全局作用域，以便 HTML 中的 onclick 可以调用
+window.toggleTheme = toggleTheme;
+
 // 初始化主题
 function initializeTheme() {
   const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
