@@ -5178,6 +5178,9 @@ function hideProjectTip(tipElement) {
   }
 }
 
+// 将 hideProjectTip 暴露到全局作用域
+window.hideProjectTip = hideProjectTip;
+
 // 在页面加载完成后显示提示
 document.addEventListener("DOMContentLoaded", () => {
   // 延迟 1 秒显示提示，让页面先加载完成
