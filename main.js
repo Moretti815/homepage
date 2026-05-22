@@ -317,9 +317,11 @@ function applyLinkStatusTags(linkStatusData) {
   const linkStatus = linkStatusData.link_status;
 
   document.querySelectorAll(".friend-card").forEach((card) => {
-    if (!card.href) return;
+    // 使用 data-link 属性或 href 属性
+    const cardLink = card.dataset.link || card.href;
+    if (!cardLink) return;
 
-    const link = card.href.replace(/\/$/, "");
+    const link = cardLink.replace(/\/$/, "");
     const status = linkStatus.find(
       (item) => item.link.replace(/\/$/, "") === link,
     );
@@ -413,13 +415,16 @@ async function renderFriends() {
                     ${friendsData
                       .map(
                         (friend) => `
-                        <a href="${friend.url}" class="friend-card" target="_blank" rel="noopener">
-                            <div class="friend-avatar">
-                                <img src="${friend.avatar}" alt="${friend.name}">
-                            </div>
-                            <div class="friend-info">
-                                <h3>${friend.name}</h3>
-                                <p>${friend.description}</p>
+                        <a href="${friend.url}" class="friend-card" target="_blank" rel="noopener" data-link="${friend.url.replace(/\/$/, "")}">
+                            ${friend.snapshot ? `<div class="friend-snapshot" style="background-image: url('${friend.snapshot}')"></div>` : ""}
+                            <div class="friend-content">
+                                <div class="friend-avatar">
+                                    <img src="${friend.avatar}" alt="${friend.name}">
+                                </div>
+                                <div class="friend-info">
+                                    <h3>${friend.name}</h3>
+                                    <p>${friend.description}</p>
+                                </div>
                             </div>
                         </a>
                     `,
@@ -3936,21 +3941,50 @@ function processTgtalkContent(text) {
   // 将 <br/> 和 <br> 转换为换行符
   processed = processed.replace(/<br\s*\/?>/gi, "\n");
 
-  // 移除 emoji 图片（保留原始 emoji 字符）
-  // 匹配常见的 emoji 图片标签
-  processed = processed.replace(/<img[^>]*class="emoji"[^>]*>/gi, "");
+  // 移除所有 emoji 图片（保留原始 emoji 字符）
+  // 策略1: 移除 class 包含 emoji 的图片
+  processed = processed.replace(/<img[^>]*class="[^"]*emoji[^"]*"[^>]*>/gi, "");
+
+  // 策略2: 移除 src 包含 emoji 或 twemoji 的图片
+  processed = processed.replace(
+    /<img[^>]*src="[^"]*(?:emoji|twemoji)[^"]*"[^>]*>/gi,
+    "",
+  );
+
+  // 策略3: 检查 alt 属性，如果是 emoji 则替换为 alt 文本
   processed = processed.replace(
     /<img[^>]*alt="([^"]*)"[^>]*>/gi,
     (match, alt) => {
-      // 如果 alt 是 emoji，保留 alt 文本
-      if (
-        /^[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]$/u.test(
-          alt,
-        )
-      ) {
-        return alt;
+      // 如果 alt 是单个 emoji 字符，保留 alt 文本
+      const emojiRegex =
+        /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{1F900}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+      const emojiMatches = alt.match(emojiRegex);
+      if (emojiMatches && emojiMatches.length > 0) {
+        return emojiMatches.join("");
       }
       return match;
+    },
+  );
+
+  // 策略4: 移除常见的 emoji CDN 图片
+  processed = processed.replace(
+    /<img[^>]*src="https?:\/\/[^"]*(?:twemoji|emoji|emojipedia)[^"]*"[^>]*>/gi,
+    "",
+  );
+
+  // 策略5: 处理 <i class="emoji"> 标签，提取其中的 emoji 字符
+  // 例如: <i class="emoji" style="..."><b>🤮</b></i> → 🤮
+  processed = processed.replace(
+    /<i[^>]*class="[^"]*emoji[^"]*"[^>]*>(?:<b>)?([^<]+)(?:<\/b>)?<\/i>/gi,
+    (match, content) => {
+      // 提取其中的 emoji 字符
+      const emojiRegex =
+        /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+      const emojiMatches = content.match(emojiRegex);
+      if (emojiMatches && emojiMatches.length > 0) {
+        return emojiMatches.join("");
+      }
+      return "";
     },
   );
 
