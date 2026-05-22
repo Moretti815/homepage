@@ -417,6 +417,21 @@ async function renderFriends() {
                         (friend) => `
                         <a href="${friend.url}" class="friend-card" target="_blank" rel="noopener" data-link="${friend.url.replace(/\/$/, "")}">
                             ${friend.snapshot ? `<div class="friend-snapshot" style="background-image: url('${friend.snapshot}')"></div>` : ""}
+                            ${
+                              friend.labels && friend.labels.length > 0
+                                ? `
+                            <div class="friend-labels">
+                                ${friend.labels
+                                  .map(
+                                    (label) => `
+                                    <span class="friend-label" style="background-color: #${label.color}">${label.name}</span>
+                                `,
+                                  )
+                                  .join("")}
+                            </div>
+                            `
+                                : ""
+                            }
                             <div class="friend-content">
                                 <div class="friend-avatar">
                                     <img src="${friend.avatar}" alt="${friend.name}">
@@ -3999,16 +4014,33 @@ function createTgtalkHTML(item) {
   const formattedDate = formatTgtalkTime(item.time);
   const processedContent = processTgtalkContent(item.text);
 
-  // 处理图片
+  // 处理图片 - 过滤掉 emoji 图片
   let imagesHTML = "";
   if (item.image && item.image.length > 0) {
-    imagesHTML = `<div class="memo-resources tgtalk-resources">${item.image
-      .map((imgUrl) => {
-        // 确保图片 URL 完整
-        const fullUrl = imgUrl.startsWith("http") ? imgUrl : `https:${imgUrl}`;
-        return `<img src="${fullUrl}" alt="图片" class="memo-resource tgtalk-image" loading="lazy">`;
-      })
-      .join("")}</div>`;
+    // 过滤掉 telegram emoji 图片
+    const validImages = item.image.filter((imgUrl) => {
+      // 排除 telegram.org 的 emoji 图片
+      if (imgUrl.includes("telegram.org/img/emoji")) {
+        return false;
+      }
+      // 排除包含 emoji 关键字的图片
+      if (imgUrl.includes("emoji") || imgUrl.includes("twemoji")) {
+        return false;
+      }
+      return true;
+    });
+
+    if (validImages.length > 0) {
+      imagesHTML = `<div class="memo-resources tgtalk-resources">${validImages
+        .map((imgUrl) => {
+          // 确保图片 URL 完整
+          const fullUrl = imgUrl.startsWith("http")
+            ? imgUrl
+            : `https:${imgUrl}`;
+          return `<img src="${fullUrl}" alt="图片" class="memo-resource tgtalk-image" loading="lazy">`;
+        })
+        .join("")}</div>`;
+    }
   }
 
   return `
