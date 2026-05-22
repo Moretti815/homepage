@@ -1,206 +1,92 @@
-{
-  "version": "v2",
-  "content": [
-    {
-      "title": "张洪Heo",
-      "url": "https://blog.zhheo.com/",
-      "icon": "https://img.zhheo.com/i/67d8fa75943e4.webp",
-      "snapshot": "https://img.zhheo.com/i/67d8fb3c51399.webp",
-      "description": "分享设计与科技生活",
-      "feed": "https://blog.zhheo.com/atom.xml",
-      "posts": [
-        {
-          "title": "洪绘响度发布：测量视频LUFS工具，并支持转换视频到指定LUFS",
-          "link": "https://blog.zhheo.com/p/bvj6caeg.html",
-          "published": "2026-05-11 14:40"
-        },
-        {
-          "title": "中国传统色上线！快速寻找和使用具有文化气息和韵味的中国传统色",
-          "link": "https://blog.zhheo.com/p/hv4xgjxl.html",
-          "published": "2026-04-29 14:28"
-        },
-        {
-          "title": "如何将小米CodingPlan的Mimo模型接入到OpenClaw",
-          "link": "https://blog.zhheo.com/p/920gpt1r.html",
-          "published": "2026-04-29 10:10"
-        }
-      ],
-      "issue_number": 1,
-      "labels": [
-        {
-          "name": "推荐",
-          "color": "d947d2",
-          "hue": 303,
-          "saturation": 66,
-          "lightness": 56
-        }
-      ]
-    },
-    {
-      "title": "清羽飞扬",
-      "url": "https://blog.liushen.fun/",
-      "icon": "https://blog.liushen.fun/info/avatar.ico",
-      "snapshot": "https://blog.liushen.fun/info/siteshot.jpg",
-      "description": "柳影曳曳，清酒孤灯，扬笔撒墨，心境如霜",
-      "feed": "https://blog.liushen.fun/atom.xml",
-      "posts": [
-        {
-          "title": "黔山赴夏，清风入怀",
-          "link": "https://blog.liushen.fun/posts/1968ba6c/",
-          "published": "2026-05-04 20:50"
-        },
-        {
-          "title": "ChronoFrame - 一款优雅的瀑布流相册系统",
-          "link": "https://blog.liushen.fun/posts/381a41ac/",
-          "published": "2026-04-05 00:00"
-        },
-        {
-          "title": "兰空图床深度美化",
-          "link": "https://blog.liushen.fun/posts/eabede01/",
-          "published": "2026-03-01 20:40"
-        }
-      ],
-      "issue_number": 3,
-      "labels": [
-        {
-          "name": "推荐",
-          "color": "d947d2",
-          "hue": 303,
-          "saturation": 66,
-          "lightness": 56
-        }
-      ]
-    },
-    {
-      "title": "iMaeGoo’s Blog",
-      "url": "https://www.imaegoo.com/",
-      "icon": "https://cdn.jsdelivr.net/npm/imaegoo/avatar.jpg",
-      "snapshot": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/iMaeGoo.webp",
-      "description": "虹墨空间站",
-      "feed": "https://www.imaegoo.com/atom.xml",
-      "posts": [
-        {
-          "title": "解决 Claude Code 安装或更新后 claude.exe 无法运行、claude native binary not installed",
-          "link": "https://www.imaegoo.com/2026/claude-code-native-binary-not-installed/",
-          "published": "2026-04-20 12:00"
-        },
-        {
-          "title": "Windows 11 26H1 显示所有托盘图标",
-          "link": "https://www.imaegoo.com/2026/win-11-show-all-tray-icon/",
-          "published": "2026-03-31 11:30"
-        },
-        {
-          "title": "OpenClaw 安装与配置",
-          "link": "https://www.imaegoo.com/2026/openclaw-start/",
-          "published": "2026-03-25 19:30"
-        }
-      ],
-      "issue_number": 4,
-      "labels": [
-        {
-          "name": "推荐",
-          "color": "d947d2",
-          "hue": 303,
-          "saturation": 66,
-          "lightness": 56
-        }
-      ]
-    },
-    {
-      "title": "纸鹿摸鱼处",
-      "url": "https://blog.zhilu.site/",
-      "icon": "https://www.zhilu.site/api/avatar.png",
-      "snapshot": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/zhilu.webp",
-      "description": "纸鹿至麓不知路，支炉制露不止漉",
-      "feed": "https://blog.zhilu.site/atom.xml",
-      "posts": [
-        {
-          "title": "北京实习300天",
-          "link": "https://blog.zhilu.site/2026/beijing-intern",
-          "published": "2026-03-19 00:31"
-        },
-        {
-          "title": "实习后买了一堆东西",
-          "link": "https://blog.zhilu.site/2026/buy-right",
-          "published": "2026-02-23 11:02"
-        },
-        {
-          "title": "生成式AI正在生成",
-          "link": "https://blog.zhilu.site/2025/ai-abuse",
-          "published": "2025-06-10 21:52"
-        }
-      ],
-      "issue_number": 6,
-      "labels": [
-        {
-          "name": "推荐",
-          "color": "d947d2",
-          "hue": 303,
-          "saturation": 66,
-          "lightness": 56
-        }
-      ]
-    },
-    {
-      "title": "二叉树树",
-      "url": "https://2x.nz",
-      "icon": "https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0",
-      "snapshot": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/2xnz.webp",
-      "description": "Protect What You Love.",
-      "feed": "https://blog.2x.nz/rss.xml",
-      "posts": [
-        {
-          "title": "加群向导",
-          "link": "https://2x.nz/posts/pin/",
-          "published": "2025-05-24 00:00"
-        },
-        {
-          "title": "俗话都说项目写久了会变成史山...今天我们来铲史...",
-          "link": "https://2x.nz/posts/improve-dev-speed/",
-          "published": "2026-04-19 18:05"
-        },
-        {
-          "title": "将你的Linux硬盘映射到Windows？",
-          "link": "https://2x.nz/posts/sshfs/",
-          "published": "2026-04-18 08:00"
-        }
-      ],
-      "issue_number": 2,
-      "labels": [
-        {
-          "name": "推荐",
-          "color": "d947d2",
-          "hue": 303,
-          "saturation": 66,
-          "lightness": 56
-        }
-      ]
-    },
-    {
-      "title": "UpXuu's blog",
-      "url": "https://upxuu.com",
-      "icon": "https://avatars.githubusercontent.com/u/132238077?v=4",
-      "snapshot": "",
-      "description": "逐光而上!",
-      "feed": "https://upxuu.com/rss.xml",
-      "posts": [],
-      "issue_number": 9,
-      "labels": [
-        {
-          "name": "失联",
-          "color": "99b0a0",
-          "hue": 138,
-          "saturation": 13,
-          "lightness": 65
-        },
-        {
-          "name": "status:403",
-          "color": "ededed",
-          "hue": 0,
-          "saturation": 0,
-          "lightness": 93
-        }
-      ]
-    }
-  ]
-}
+23秒
+Run npm ci --verbose --progress=true
+npm verbose cli /opt/hostedtoolcache/node/22.22.3/x64/bin/node /opt/hostedtoolcache/node/22.22.3/x64/bin/npm
+npm info using npm@10.9.8
+npm info using node@v22.22.3
+npm verbose title npm ci
+npm verbose argv "ci" "--loglevel" "verbose" "--progress" "true"
+npm verbose logfile logs-max:10 dir:/home/runner/.npm/_logs/2026-05-22T14_44_29_102Z-
+npm verbose logfile /home/runner/.npm/_logs/2026-05-22T14_44_29_102Z-debug-0.log
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/fsevents
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-win32-x64-msvc
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-win32-x64-gnu
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-win32-ia32-msvc
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-win32-arm64-msvc
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-openharmony-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-openbsd-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-s390x-gnu
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-riscv64-musl
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-riscv64-gnu
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-ppc64-musl
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-ppc64-gnu
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-loong64-musl
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-loong64-gnu
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-arm64-musl
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-arm64-gnu
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-arm-musleabihf
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-linux-arm-gnueabihf
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-freebsd-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-freebsd-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-darwin-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-darwin-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-android-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@rollup/rollup-android-arm-eabi
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/win32-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/win32-ia32
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/win32-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/sunos-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/openbsd-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/netbsd-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-s390x
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-riscv64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-ppc64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-mips64el
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-loong64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-ia32
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/linux-arm
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/freebsd-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/freebsd-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/darwin-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/darwin-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/android-x64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/android-arm64
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/android-arm
+npm verbose reify failed optional dependency /home/runner/work/homepage/homepage/node_modules/@esbuild/aix-ppc64
+npm http cache vite@https://registry.npmmirror.com/vite/-/vite-5.4.21.tgz 0ms (cache hit)
+npm http cache terser@https://registry.npmmirror.com/terser/-/terser-5.48.0.tgz 0ms (cache hit)
+npm http cache rollup@https://registry.npmmirror.com/rollup/-/rollup-4.60.4.tgz 0ms (cache hit)
+npm http cache source-map@https://registry.npmmirror.com/source-map/-/source-map-0.6.1.tgz 0ms (cache hit)
+npm http cache source-map-js@https://registry.npmmirror.com/source-map-js/-/source-map-js-1.2.1.tgz 0ms (cache hit)
+npm http cache source-map-support@https://registry.npmmirror.com/source-map-support/-/source-map-support-0.5.21.tgz 0ms (cache hit)
+npm http cache postcss@https://registry.npmmirror.com/postcss/-/postcss-8.5.15.tgz 0ms (cache hit)
+npm http cache nanoid@https://registry.npmmirror.com/nanoid/-/nanoid-3.3.12.tgz 0ms (cache hit)
+npm http cache marked@https://registry.npmmirror.com/marked/-/marked-18.0.4.tgz 0ms (cache hit)
+npm http cache picocolors@https://registry.npmmirror.com/picocolors/-/picocolors-1.1.1.tgz 0ms (cache hit)
+npm http cache esbuild@https://registry.npmmirror.com/esbuild/-/esbuild-0.21.5.tgz 0ms (cache hit)
+npm http cache buffer-from@https://registry.npmmirror.com/buffer-from/-/buffer-from-1.1.2.tgz 0ms (cache hit)
+npm http cache commander@https://registry.npmmirror.com/commander/-/commander-2.20.3.tgz 0ms (cache hit)
+npm http cache acorn@https://registry.npmmirror.com/acorn/-/acorn-8.16.0.tgz 0ms (cache hit)
+npm http cache @types/estree@https://registry.npmmirror.com/@types/estree/-/estree-1.0.8.tgz 0ms (cache hit)
+npm http cache @rollup/rollup-linux-x64-musl@https://registry.npmmirror.com/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.60.4.tgz 0ms (cache hit)
+npm http cache @rollup/rollup-linux-x64-gnu@https://registry.npmmirror.com/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.60.4.tgz 0ms (cache hit)
+npm http cache @jridgewell/trace-mapping@https://registry.npmmirror.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.31.tgz 0ms (cache hit)
+npm http cache @jridgewell/sourcemap-codec@https://registry.npmmirror.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz 0ms (cache hit)
+npm http cache @jridgewell/source-map@https://registry.npmmirror.com/@jridgewell/source-map/-/source-map-0.3.11.tgz 0ms (cache hit)
+npm http cache @jridgewell/resolve-uri@https://registry.npmmirror.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz 0ms (cache hit)
+npm http cache @esbuild/linux-x64@https://registry.npmmirror.com/@esbuild/linux-x64/-/linux-x64-0.21.5.tgz 0ms (cache hit)
+npm http cache @jridgewell/gen-mapping@https://registry.npmmirror.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz 0ms (cache hit)
+npm http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 239ms
+npm http fetch GET 200 https://registry.npmjs.org/esbuild 68ms (cache miss)
+npm http fetch GET 200 https://registry.npmjs.org/vite 110ms (cache miss)
+npm http fetch GET https://registry.npmmirror.com/commander/-/commander-2.20.3.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/@types/estree/-/estree-1.0.8.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/acorn/-/acorn-8.16.0.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/rollup/-/rollup-4.60.4.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/source-map-support/-/source-map-support-0.5.21.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/terser/-/terser-5.48.0.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/nanoid/-/nanoid-3.3.12.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/@jridgewell/source-map/-/source-map-0.3.11.tgz attempt 1 failed with 502
+npm http fetch GET https://registry.npmmirror.com/picocolors/-/picocolors-1.1.1.tgz attempt 1 failed with 502
