@@ -93,7 +93,7 @@ const ongoingProject = {
 const ENV = import.meta.env;
 
 // GitHub API配置
-const GITHUB_USERNAME = ENV.VITE_GITHUB_USERNAME || "yuazhi";
+const GITHUB_USERNAME = ENV.VITE_GITHUB_USERNAME || "Mroetti815";
 const GITHUB_API_BASE = "https://api.github.com";
 const GITHUB_TOKEN = ENV.VITE_GITHUB_TOKEN || "#";
 
@@ -552,7 +552,9 @@ async function fetchGitHubData() {
 
     // 忽略特定仓库
     repos = repos.filter(
-      (repo) => repo.name !== "yuazhi" && repo.full_name !== "yuazhi/yuazhi",
+      (repo) =>
+        repo.name !== "Mroetti815" &&
+        repo.full_name !== "Mroetti815/Mroetti815",
     );
 
     // 获取每个仓库的详细信息
@@ -1857,7 +1859,7 @@ function renderActivityTimeline(data, activities = null) {
                     </div>
                     <div class="activity-content">
                         <div class="activity-header">
-                            yuazhi has no activity yet for this period.
+                            Mroetti has no activity yet for this period.
                         </div>
                     </div>
                 </div>
@@ -2701,8 +2703,8 @@ async function renderOverview() {
     const mostRecentRepo = repoDetails.find(
       (repo) =>
         !repo.is_fork &&
-        repo.name !== "yuazhi" &&
-        repo.full_name !== "yuazhi/yuazhi",
+        repo.name !== "Mroetti815" &&
+        repo.full_name !== "Mroetti815/Mroetti815",
     );
 
     // 为最新项目添加标识
@@ -2760,11 +2762,11 @@ async function renderOverview() {
             <div class="github-stats-section">
                 <h2 class="stats-title">Contributions & Reactions</h2>
                 <div class="stats-container">
-                    <img src="https://github.chenc.dev/https://raw.githubusercontent.com/yuazhi/yuazhi/f33292b1b2812dbe789397126b2dd437455aac18/metrics.isocalendar.svg" 
+                    <img src="https://github.chenc.dev/https://raw.githubusercontent.com/Moretti815/Moretti815/f097c976fc633baf99a97cb4414f75eb8a067747/metrics.isocalendar.svg" 
                          alt="GitHub Contributions Calendar" 
                          class="github-stats-image"
                          loading="lazy">
-                    <img src="https://github.chenc.dev/https://raw.githubusercontent.com/yuazhi/yuazhi/c2a0dd99dbf105e24a648037b126e4e7f30f845f/metrics.base.svg" 
+                    <img src="https://github.chenc.dev/https://raw.githubusercontent.com/Moretti815/Moretti815/f097c976fc633baf99a97cb4414f75eb8a067747/metrics.base.svg" 
                          alt="GitHub Base Metrics" 
                          class="github-stats-image"
                          loading="lazy">
@@ -4036,6 +4038,12 @@ function processTgtalkContent(text) {
   // 使用 marked 解析 Markdown
   processed = marked.parse(processed);
 
+  // 将标签转换为可点击的链接（在 Markdown 解析后处理）
+  processed = processed.replace(
+    /#(\S+)/g,
+    '<a href="javascript:void(0)" class="memo-inline-tag" onclick="filterTgtalkByTag(\'$1\')">#$1</a>',
+  );
+
   return processed;
 }
 
@@ -4419,13 +4427,60 @@ async function fetchMemosData() {
   }
 }
 
+// 分别存储 memos 和 tgtalk 的筛选标签
+let memosFilterTag = null;
+let tgtalkFilterTag = null;
+
 // Function to style inline tags within memo content
 function styleInlineTags(content) {
   if (!content) return "";
   // This regex looks for # followed by one or more non-whitespace characters.
   // It captures the whole tag including the #.
-  return content.replace(/#(\S+)/g, '<span class="memo-inline-tag">#$1</span>');
+  return content.replace(
+    /#(\S+)/g,
+    '<span class="memo-inline-tag" onclick="filterMemosByTag(\'$1\')">#$1</span>',
+  );
 }
+
+// 筛选 memos 说说
+function filterMemosByTag(tag) {
+  memosFilterTag = tag;
+  const container = document.getElementById("memos-content");
+  if (container) {
+    renderMemosContent(container, tag);
+  }
+}
+
+// 筛选 tgtalk 说说
+function filterTgtalkByTag(tag) {
+  tgtalkFilterTag = tag;
+  const container = document.getElementById("memos-content");
+  if (container) {
+    renderTgtalkContent(container, tag);
+  }
+}
+
+// 清除筛选
+function clearTagFilter() {
+  if (currentMemoType === "memos") {
+    memosFilterTag = null;
+  } else {
+    tgtalkFilterTag = null;
+  }
+  const container = document.getElementById("memos-content");
+  if (container) {
+    if (currentMemoType === "memos") {
+      renderMemosContent(container);
+    } else {
+      renderTgtalkContent(container);
+    }
+  }
+}
+
+// 将函数暴露到全局作用域
+window.filterMemosByTag = filterMemosByTag;
+window.filterTgtalkByTag = filterTgtalkByTag;
+window.clearTagFilter = clearTagFilter;
 
 // 渲染说说的函数
 // 全局变量存储说说数据
@@ -4601,15 +4656,15 @@ async function switchMemoType(type) {
     }
   });
 
-  // 重新加载内容
+  // 重新加载内容，使用对应的筛选标签
   const contentWrapper = document.getElementById("memos-content");
   if (contentWrapper) {
     contentWrapper.innerHTML = '<div class="loading-text">加载中...</div>';
 
     if (type === "memos") {
-      await renderMemosContent(contentWrapper);
+      await renderMemosContent(contentWrapper, memosFilterTag);
     } else {
-      await renderTgtalkContent(contentWrapper);
+      await renderTgtalkContent(contentWrapper, tgtalkFilterTag);
     }
   }
 }
@@ -4618,7 +4673,7 @@ async function switchMemoType(type) {
 window.switchMemoType = switchMemoType;
 
 // 渲染 Memos 内容
-async function renderMemosContent(container) {
+async function renderMemosContent(container, filterTag = null) {
   try {
     const memos = await fetchMemosData();
 
@@ -4635,12 +4690,30 @@ async function renderMemosContent(container) {
       return;
     }
 
+    // 筛选标签
+    let filteredMemos = memos;
+    if (filterTag) {
+      filteredMemos = memos.filter((memo) => {
+        // 使用更灵活的正则：匹配 #标签 后跟空格、换行、#或字符串结尾
+        const tagRegex = new RegExp(`#${filterTag}(?=[\\s#]|$)`, "i");
+        return tagRegex.test(memo.content);
+      });
+    }
+
     // 将说说按置顶状态分组
-    const pinnedMemos = memos.filter((memo) => memo.pinned);
-    allUnpinnedMemos = memos.filter((memo) => !memo.pinned);
+    const pinnedMemos = filteredMemos.filter((memo) => memo.pinned);
+    allUnpinnedMemos = filteredMemos.filter((memo) => !memo.pinned);
 
     // 重置显示计数
     currentDisplayCount = Math.min(MEMOS_PER_LOAD, allUnpinnedMemos.length);
+
+    // 筛选提示
+    const filterNotice = filterTag
+      ? `<div class="filter-notice">
+          <span>正在筛选标签: <strong>#${filterTag}</strong></span>
+          <button class="clear-filter-btn" onclick="clearTagFilter()">清除筛选</button>
+        </div>`
+      : "";
 
     // 渲染置顶说说
     const pinnedMemosHTML =
@@ -4662,12 +4735,26 @@ async function renderMemosContent(container) {
         </div>`
       : "";
 
+    // 空状态提示
+    const emptyState =
+      filteredMemos.length === 0
+        ? `<div class="blankslate">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <h3>没有找到相关内容</h3>
+            <p>没有找到包含标签 #${filterTag} 的说说</p>
+          </div>`
+        : "";
+
     container.innerHTML = `
+      ${filterNotice}
       <div class="memos-container">
         ${pinnedMemosHTML}
         <div class="unpinned-memos-container">${initialMemosHTML}</div>
         ${loadMoreButton}
       </div>
+      ${emptyState}
     `;
 
     initLightbox();
@@ -4686,7 +4773,7 @@ async function renderMemosContent(container) {
 }
 
 // 渲染 Tgtalk 内容
-async function renderTgtalkContent(container) {
+async function renderTgtalkContent(container, filterTag = null) {
   try {
     const talks = await fetchTgtalkData();
 
@@ -4703,12 +4790,44 @@ async function renderTgtalkContent(container) {
       return;
     }
 
-    const talksHTML = talks.map(createTgtalkHTML).join("");
+    // 筛选标签
+    let filteredTalks = talks;
+    if (filterTag) {
+      filteredTalks = talks.filter((talk) => {
+        // 使用更灵活的正则：匹配 #标签 后跟空格、换行、#或字符串结尾
+        const tagRegex = new RegExp(`#${filterTag}(?=[\\s#]|$)`, "i");
+        return tagRegex.test(talk.text);
+      });
+    }
+
+    // 筛选提示
+    const filterNotice = filterTag
+      ? `<div class="filter-notice">
+          <span>正在筛选标签: <strong>#${filterTag}</strong></span>
+          <button class="clear-filter-btn" onclick="clearTagFilter()">清除筛选</button>
+        </div>`
+      : "";
+
+    const talksHTML = filteredTalks.map(createTgtalkHTML).join("");
+
+    // 空状态提示
+    const emptyState =
+      filteredTalks.length === 0
+        ? `<div class="blankslate">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <h3>没有找到相关内容</h3>
+            <p>没有找到包含标签 #${filterTag} 的说说</p>
+          </div>`
+        : "";
 
     container.innerHTML = `
+      ${filterNotice}
       <div class="memos-container tgtalk-container">
         ${talksHTML}
       </div>
+      ${emptyState}
     `;
 
     initLightbox();
@@ -5676,6 +5795,10 @@ function hideContributionTooltip() {
 // 将函数暴露到全局，以便 HTML 事件可以调用
 window.showContributionTooltip = showContributionTooltip;
 window.hideContributionTooltip = hideContributionTooltip;
+window.showProjectDetail = showProjectDetail;
+window.toggleActivity = toggleActivity;
+window.downloadImage = downloadImage;
+window.closeProjectModal = closeProjectModal;
 
 // 检测是否为移动设备
 function isMobileDevice() {

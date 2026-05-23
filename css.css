@@ -4717,6 +4717,59 @@ margin-left: auto; /* 保持靠右 */
 
 .memo-inline-tag {
     color: #0366d6; /* Blue color for inline tags */
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.memo-inline-tag:hover {
+    background-color: rgba(3, 102, 214, 0.1);
+    text-decoration: underline;
+}
+
+[data-theme="dark"] .memo-inline-tag {
+    color: #58a6ff;
+}
+
+[data-theme="dark"] .memo-inline-tag:hover {
+    background-color: rgba(88, 166, 255, 0.1);
+}
+
+/* 筛选提示框样式 */
+.filter-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.filter-notice strong {
+    color: var(--link-color);
+}
+
+.clear-filter-btn {
+    padding: 6px 12px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
+    color: var(--text-color);
 }
 
 /* ============================================
