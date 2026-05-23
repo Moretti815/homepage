@@ -2778,9 +2778,11 @@ async function renderOverview() {
     // 初始化活动图表
     setTimeout(async () => {
       const activityContainer = content.querySelector(".activity-container");
-      const activityGraph = await generateActivityGraph();
-      activityContainer.appendChild(activityGraph);
-      initActivityChart(activityContainer);
+      if (activityContainer) {
+        const activityGraph = await generateActivityGraph();
+        activityContainer.appendChild(activityGraph);
+        initActivityChart(activityContainer);
+      }
     }, 100);
   } catch (error) {
     console.error("Error rendering overview:", error);
