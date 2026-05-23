@@ -1,0 +1,24 @@
+{
+    "sponsors": [
+        {
+            "name": "示例用户",
+            "avatar": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/moretti.webp",
+            "website": "https://www.2005815.xyz",
+            "date": "2025-05-23",
+            "amount": "¥6.66",
+            "description": "感谢你的分享，继续加油！"
+        }
+    ],
+    "config": {
+        "alipay": {
+            "name": "支付宝",
+            "image": "alipay.avif"
+        },
+        "wechat": {
+            "name": "微信支付",
+            "image": "weixin.avif"
+        },
+        "pageTitle": "赞赏支持",
+        "pageDescription": "感谢您的支持与鼓励！"
+    }
+}

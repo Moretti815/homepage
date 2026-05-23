@@ -405,7 +405,183 @@ function downloadImage(url, filename) {
     });
 }
 
-// 渲染友情链接页面
+// 当前选中的友链类型
+let currentFriendType = "friends"; // 'friends' 或 'circle'
+
+// 切换友链类型
+async function switchFriendType(type) {
+  if (type === currentFriendType) return;
+
+  currentFriendType = type;
+
+  // 更新 Tab 样式
+  document.querySelectorAll(".friends-tab").forEach((tab) => {
+    tab.classList.remove("active");
+    if (tab.dataset.type === type) {
+      tab.classList.add("active");
+    }
+  });
+
+  // 重新加载内容
+  const contentWrapper = document.getElementById("friends-content");
+  if (contentWrapper) {
+    contentWrapper.innerHTML = '<div class="loading-text">加载中...</div>';
+
+    if (type === "friends") {
+      await renderFriendsContent(contentWrapper);
+    } else {
+      await renderFriendCircleContent(contentWrapper);
+    }
+  }
+}
+
+// 将函数暴露到全局，以便 onclick 可以调用
+window.switchFriendType = switchFriendType;
+
+// 渲染友链内容
+async function renderFriendsContent(container) {
+  try {
+    const friendsData = await fetchFriendsData();
+
+    container.innerHTML = `
+      <div class="friends-grid">
+        ${friendsData
+          .map(
+            (friend) => `
+            <a href="${friend.url}" class="friend-card" target="_blank" rel="noopener" data-link="${friend.url.replace(/\/$/, "")}">
+                ${friend.snapshot ? `<div class="friend-snapshot" style="background-image: url('${friend.snapshot}')"></div>` : ""}
+                ${
+                  friend.labels && friend.labels.length > 0
+                    ? `
+                <div class="friend-labels">
+                    ${friend.labels
+                      .map(
+                        (label) => `
+                        <span class="friend-label" style="background-color: #${label.color}">${label.name}</span>
+                    `,
+                      )
+                      .join("")}
+                </div>
+                `
+                    : ""
+                }
+                <div class="friend-content">
+                    <div class="friend-avatar">
+                        <img src="${friend.avatar}" alt="${friend.name}">
+                    </div>
+                    <div class="friend-info">
+                        <h3>${friend.name}</h3>
+                        <p>${friend.description}</p>
+                    </div>
+                </div>
+            </a>
+        `,
+          )
+          .join("")}
+      </div>
+      <div class="site-info">
+          <h3>本站基本信息</h3>
+          <div class="site-info-content">
+              <div class="site-info-item">
+                  <span class="site-info-label">博客名称：</span>
+                  <span class="site-info-value"><a href="javascript:void(0);" onclick="copyToClipboard('鸢栀的仓库')">鸢栀的仓库</a></span>
+              </div>
+              <div class="site-info-item">
+                  <span class="site-info-label">地址：</span>
+                  <span class="site-info-value"><a href="javascript:void(0);" onclick="copyToClipboard('https://yuazhi.cn/')">https://yuazhi.cn/</a></span>
+              </div>
+              <div class="site-info-item">
+                  <span class="site-info-label">图标：</span>
+                  <span class="site-info-value"><a href="javascript:void(0);" onclick="downloadImage('https://cdn.rjjr.cn/assets/IMG_0235.PNG', 'yuazhi.png')">点击下载</a></span>
+              </div>
+              <div class="site-info-item">
+                  <span class="site-info-label">简介：</span>
+                  <span class="site-info-value"><a href="javascript:void(0);" onclick="copyToClipboard('每天写下自己的喜好')">每天写下自己的喜好</a></span>
+              </div>
+              <div class="site-info-item">
+                  <span class="site-info-label">申请邮箱：</span>
+                  <span class="site-info-value"><a href="mailto:hfyu2008@gmail.com">hfyu2008@gmail.com</a></span>
+              </div>
+          </div>
+      </div>
+    `;
+
+    // 获取并应用延迟状态标签
+    const linkStatusData = await fetchLinkStatusData();
+    if (linkStatusData) {
+      applyLinkStatusTags(linkStatusData);
+    }
+  } catch (error) {
+    console.error("Error rendering friends content:", error);
+    container.innerHTML = `
+      <div class="blankslate">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <h3>加载失败</h3>
+        <p>无法获取友情链接数据，请稍后刷新页面重试</p>
+      </div>
+    `;
+  }
+}
+
+// 渲染朋友圈内容
+async function renderFriendCircleContent(container) {
+  container.innerHTML = `
+    <div id="friend-circle-lite-root"></div>
+  `;
+
+  // 动态加载 Friend-Circle-Lite 脚本和样式
+  const existingCss = document.getElementById("fclite-css");
+  const existingScript = document.getElementById("fclite-script");
+
+  // 如果已经加载过，先移除
+  if (existingCss) existingCss.remove();
+  if (existingScript) existingScript.remove();
+
+  // 加载 CSS
+  const link = document.createElement("link");
+  link.id = "fclite-css";
+  link.rel = "stylesheet";
+  link.href =
+    "https://fastly.jsdelivr.net/gh/willow-god/Friend-Circle-Lite/main/fclite.min.css";
+  document.head.appendChild(link);
+
+  // 配置 UserConfig
+  if (typeof window.UserConfig === "undefined") {
+    window.UserConfig = {
+      private_api_url: "https://fc-lite.268682.xyz/",
+      page_turning_number: 20,
+      error_img: "https://i.p-i.vip/30/20240815-66bced9226a36.webp",
+    };
+  }
+
+  // 加载 JS
+  const script = document.createElement("script");
+  script.id = "fclite-script";
+  script.src =
+    "https://fastly.jsdelivr.net/gh/willow-god/Friend-Circle-Lite/main/fclite.min.js";
+  script.onload = () => {
+    // 脚本加载完成后，应用当前主题
+    applyFriendCircleTheme();
+  };
+  document.body.appendChild(script);
+}
+
+// 应用朋友圈主题（适配明暗模式）
+function applyFriendCircleTheme() {
+  const currentTheme =
+    document.documentElement.getAttribute("data-theme") || "light";
+  const root = document.getElementById("friend-circle-lite-root");
+  if (root) {
+    root.setAttribute("data-theme", currentTheme);
+  }
+}
+
+// 将函数暴露到全局
+window.applyFriendCircleTheme = applyFriendCircleTheme;
+
+// 渲染友情链接页面（带 Tab 切换）
 async function renderFriends() {
   const contentArea = document.querySelector(".content-area");
 
@@ -413,86 +589,49 @@ async function renderFriends() {
   showSkeletonLoading("friends");
 
   try {
-    // 获取友情链接数据
-    const friendsData = await fetchFriendsData();
-
     // 更新到下一步：渲染友链列表
     await updateLoadingStep();
 
-    contentArea.innerHTML = `
-            <div class="friends-container">
-                <div class="friends-grid">
-                    ${friendsData
-                      .map(
-                        (friend) => `
-                        <a href="${friend.url}" class="friend-card" target="_blank" rel="noopener" data-link="${friend.url.replace(/\/$/, "")}">
-                            ${friend.snapshot ? `<div class="friend-snapshot" style="background-image: url('${friend.snapshot}')"></div>` : ""}
-                            ${
-                              friend.labels && friend.labels.length > 0
-                                ? `
-                            <div class="friend-labels">
-                                ${friend.labels
-                                  .map(
-                                    (label) => `
-                                    <span class="friend-label" style="background-color: #${label.color}">${label.name}</span>
-                                `,
-                                  )
-                                  .join("")}
-                            </div>
-                            `
-                                : ""
-                            }
-                            <div class="friend-content">
-                                <div class="friend-avatar">
-                                    <img src="${friend.avatar}" alt="${friend.name}">
-                                </div>
-                                <div class="friend-info">
-                                    <h3>${friend.name}</h3>
-                                    <p>${friend.description}</p>
-                                </div>
-                            </div>
-                        </a>
-                    `,
-                      )
-                      .join("")}
-                </div>
-                <div class="site-info">
-                    <h3>本站基本信息</h3>
-                    <div class="site-info-content">
-                        <div class="site-info-item">
-                            <span class="site-info-label">博客名称：</span>
-                            <span class="site-info-value"><a href="javascript:void(0);" onclick="copyToClipboard('鸢栀的仓库')">鸢栀的仓库</a></span>
-                        </div>
-                        <div class="site-info-item">
-                            <span class="site-info-label">地址：</span>
-                            <span class="site-info-value"><a href="javascript:void(0);" onclick="copyToClipboard('https://yuazhi.cn/')">https://yuazhi.cn/</a></span>
-                        </div>
-                        <div class="site-info-item">
-                            <span class="site-info-label">图标：</span>
-                            <span class="site-info-value"><a href="javascript:void(0);" onclick="downloadImage('https://cdn.rjjr.cn/assets/IMG_0235.PNG', 'yuazhi.png')">点击下载</a></span>
-                        </div>
-                        <div class="site-info-item">
-                            <span class="site-info-label">简介：</span>
-                            <span class="site-info-value"><a href="javascript:void(0);" onclick="copyToClipboard('每天写下自己的喜好')">每天写下自己的喜好</a></span>
-                        </div>
-                        <div class="site-info-item">
-                            <span class="site-info-label">申请邮箱：</span>
-                            <span class="site-info-value"><a href="mailto:hfyu2008@gmail.com">hfyu2008@gmail.com</a></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+    // 渲染 Tab 切换栏
+    const tabsHTML = `
+      <div class="friends-tabs">
+        <button class="friends-tab ${currentFriendType === "friends" ? "active" : ""}" data-type="friends" onclick="switchFriendType('friends')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          友链
+        </button>
+        <button class="friends-tab ${currentFriendType === "circle" ? "active" : ""}" data-type="circle" onclick="switchFriendType('circle')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+          朋友圈
+        </button>
+      </div>
+      <div class="friends-content-wrapper" id="friends-content">
+        <!-- 内容将在这里动态加载 -->
+      </div>
+    `;
+
+    contentArea.innerHTML = tabsHTML;
+
+    // 根据当前选中的类型加载对应内容
+    const contentWrapper = document.getElementById("friends-content");
+
+    if (currentFriendType === "friends") {
+      await renderFriendsContent(contentWrapper);
+    } else {
+      await renderFriendCircleContent(contentWrapper);
+    }
 
     // 更新到最后一步：完成加载
     await updateLoadingStep();
     hideSkeletonLoading();
-
-    // 获取并应用延迟状态标签
-    const linkStatusData = await fetchLinkStatusData();
-    if (linkStatusData) {
-      applyLinkStatusTags(linkStatusData);
-    }
   } catch (error) {
     // 如果API调用失败，显示错误信息
     contentArea.innerHTML = `
@@ -1852,7 +1991,7 @@ function renderActivityTimeline(data, activities = null) {
                                           activity.branch
                                             ? `
                                             <span class="branch-tag ${getRandomBranchBgClass()}">
-                                                <svg class="octicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12">
+                                                <svg class="octicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
                                                     <path d="M3.75 1.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5H3.75Zm6.75.75V4.25c0 .138.112.25.25.25H12.5v7h-9V2.25h6.5V2.25ZM5 3.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Zm0 2.5a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Zm0 2.5a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
                                                 </svg>
                                                 ${activity.branch}
@@ -4004,9 +4143,7 @@ function createTgtalkHTML(item) {
     <div class="memo-card tgtalk-card">
       <div class="memo-header">
         <span class="memo-date">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           ${formattedDate}
         </span>
         <span class="memo-views">
@@ -4228,6 +4365,11 @@ function toggleTheme() {
   // 保存用户手动设置的主题偏好
   localStorage.setItem("theme-preference", "manual");
   localStorage.setItem("theme", newTheme);
+
+  // 同步更新朋友圈主题
+  if (typeof applyFriendCircleTheme === "function") {
+    applyFriendCircleTheme();
+  }
 }
 
 // 将 toggleTheme 暴露到全局作用域，以便 HTML 中的 onclick 可以调用
@@ -4463,9 +4605,7 @@ function createMemoHTML(memo) {
                     : ""
                 }
                 <span class="memo-date">
-                    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     ${formattedDate}
                 </span>
             </div>
@@ -4507,15 +4647,11 @@ async function renderMemos() {
     const tabsHTML = `
       <div class="memos-tabs">
         <button class="memos-tab ${currentMemoType === "memos" ? "active" : ""}" data-type="memos" onclick="switchMemoType('memos')">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.612 8.116a6.392 6.392 0 0 0 .682 3.166 6.5 6.5 0 0 0 5.239 3.565 6.392 6.392 0 0 0 3.166-.682 6.8 6.8 0 0 1-2.143-2.13 6.8 6.8 0 0 1-2.13-2.143 6.8 6.8 0 0 1-1.814-3.776Zm11.776 0a6.8 6.8 0 0 1-1.814 3.776 6.8 6.8 0 0 1-2.13 2.143 6.8 6.8 0 0 1-2.143 2.13 6.392 6.392 0 0 0 3.166.682 6.5 6.5 0 0 0 5.239-3.565 6.392 6.392 0 0 0 .682-3.166ZM8.884 1.553a6.8 6.8 0 0 1 3.776 1.814 6.8 6.8 0 0 1 2.143 2.13 6.8 6.8 0 0 1 2.13 2.143 6.392 6.392 0 0 0-.682-3.166 6.5 6.5 0 0 0-5.239-3.565 6.392 6.392 0 0 0-3.166.682Zm-1.768 0a6.392 6.392 0 0 0-3.166-.682 6.5 6.5 0 0 0-5.239 3.565 6.392 6.392 0 0 0 .682 3.166 6.8 6.8 0 0 1 1.814-3.776 6.8 6.8 0 0 1 2.13-2.143 6.8 6.8 0 0 1 2.143-2.13Z"/>
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m20.83 10.715l-.518 1.932c-.605 2.255-.907 3.383-1.592 4.114a4 4 0 0 1-2.01 1.161q-.145.034-.295.052c-.915.113-2.032-.186-4.064-.73c-2.255-.605-3.383-.907-4.114-1.592a4 4 0 0 1-1.161-2.011c-.228-.976.074-2.103.679-4.358l.517-1.932l.244-.905c.455-1.666.761-2.583 1.348-3.21a4 4 0 0 1 2.01-1.16c.976-.228 2.104.074 4.36.679c2.254.604 3.382.906 4.113 1.59a4 4 0 0 1 1.161 2.012c.228.976-.075 2.103-.679 4.358m-9.778-.91a.75.75 0 0 1 .919-.53l4.83 1.295a.75.75 0 1 1-.389 1.448l-4.83-1.294a.75.75 0 0 1-.53-.918m-.776 2.898a.75.75 0 0 1 .918-.53l2.898.777a.75.75 0 1 1-.388 1.448l-2.898-.776a.75.75 0 0 1-.53-.919" clip-rule="evenodd"/><path fill="currentColor" d="M16.415 17.975a4 4 0 0 1-1.068 1.677c-.731.685-1.859.987-4.114 1.591s-3.383.907-4.358.679a4 4 0 0 1-2.011-1.161c-.685-.731-.988-1.859-1.592-4.114l-.517-1.932c-.605-2.255-.907-3.383-.68-4.358a4 4 0 0 1 1.162-2.011c.731-.685 1.859-.987 4.114-1.592q.638-.172 1.165-.309l-.244.906l-.517 1.932c-.605 2.255-.907 3.382-.68 4.358a4 4 0 0 0 1.162 2.011c.731.685 1.859.987 4.114 1.592c2.032.544 3.149.843 4.064.73" opacity=".5"/></svg>
           Memos
         </button>
         <button class="memos-tab ${currentMemoType === "tgtalk" ? "active" : ""}" data-type="tgtalk" onclick="switchMemoType('tgtalk')">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.612 8.116a6.392 6.392 0 0 0 .682 3.166 6.5 6.5 0 0 0 5.239 3.565 6.392 6.392 0 0 0 3.166-.682 6.8 6.8 0 0 1-2.143-2.13 6.8 6.8 0 0 1-2.13-2.143 6.8 6.8 0 0 1-1.814-3.776Zm11.776 0a6.8 6.8 0 0 1-1.814 3.776 6.8 6.8 0 0 1-2.13 2.143 6.8 6.8 0 0 1-2.143 2.13 6.392 6.392 0 0 0 3.166.682 6.5 6.5 0 0 0 5.239-3.565 6.392 6.392 0 0 0 .682-3.166ZM8.884 1.553a6.8 6.8 0 0 1 3.776 1.814 6.8 6.8 0 0 1 2.143 2.13 6.8 6.8 0 0 1 2.13 2.143 6.392 6.392 0 0 0-.682-3.166 6.5 6.5 0 0 0-5.239-3.565 6.392 6.392 0 0 0-3.166.682Zm-1.768 0a6.392 6.392 0 0 0-3.166-.682 6.5 6.5 0 0 0-5.239 3.565 6.392 6.392 0 0 0 .682 3.166 6.8 6.8 0 0 1 1.814-3.776 6.8 6.8 0 0 1 2.13-2.143 6.8 6.8 0 0 1 2.143-2.13Z"/>
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none"><path fill="#c77f67" d="M17.762 1H4.143c-.578 0-1.047.469-1.047 1.048v19.904c0 .579.469 1.048 1.047 1.048h13.62c.578 0 1.047-.469 1.047-1.048V2.048c0-.579-.469-1.048-1.048-1.048"/><path fill="#fff" d="M14.619 8.857a.524.524 0 0 1-.524.524H8.857a.524.524 0 0 1-.524-.524V5.714a.524.524 0 0 1 .524-.524h5.238a.524.524 0 0 1 .524.524z"/><path stroke="#191919" stroke-linecap="round" stroke-linejoin="round" d="M2.047 4.143H5.19M2.047 9.38H5.19m-3.143 5.24H5.19m-3.143 5.237H5.19"/><path fill="#66e1ff" d="M21.953 4.143v3.143H18.81v-4.19h2.095a1.05 1.05 0 0 1 1.048 1.047"/><path fill="#ffef5e" d="M21.953 7.286H18.81v4.19h3.143z"/><path fill="#ff808c" d="M21.953 11.476H18.81v4.19h3.143z"/><path fill="#b2ffc0" d="M21.953 15.667v3.143a1.05 1.05 0 0 1-1.048 1.047H18.81v-4.19z"/><path stroke="#191919" stroke-linecap="round" stroke-linejoin="round" d="M17.762 1H4.143c-.578 0-1.047.469-1.047 1.048v19.904c0 .579.469 1.048 1.047 1.048h13.62c.578 0 1.047-.469 1.047-1.048V2.048c0-.579-.469-1.048-1.048-1.048"/><path stroke="#191919" stroke-linecap="round" stroke-linejoin="round" d="M14.619 8.857a.524.524 0 0 1-.524.524H8.857a.524.524 0 0 1-.524-.524V5.714a.524.524 0 0 1 .524-.524h5.238a.524.524 0 0 1 .524.524zm7.334-4.714v3.143H18.81v-4.19h2.095a1.05 1.05 0 0 1 1.048 1.047m0 3.143H18.81v4.19h3.143zm0 4.19H18.81v4.19h3.143zm0 4.191v3.143a1.05 1.05 0 0 1-1.048 1.047H18.81v-4.19z"/></g></svg>
           说说
         </button>
       </div>
@@ -4901,9 +5037,7 @@ async function renderArticles() {
         articlesContentHTML += `
                 <a href="#" class="post-card" data-article-id="${article.id}">
                     <div class="post-date">
-                        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         ${formatDate(article.created_at)}
                     </div>
                     <h3 class="post-title">${article.title}</h3>
@@ -4996,9 +5130,7 @@ function loadMoreArticles(articles) {
     const articleHTML = `
             <a href="#" class="post-card" data-article-id="${article.id}">
                 <div class="post-date">
-                    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     ${formatDate(article.created_at)}
                 </div>
                 <h3 class="post-title">${article.title}</h3>

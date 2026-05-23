@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程表 - Moretti的仓库</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="/css.css">
+    <style>
+        /* 课程表专用样式 */
+        .timetable-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .timetable-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .timetable-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .timetable-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .week-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .week-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .week-btn:hover:not(:disabled) {
+            background: var(--bg-secondary);
+            border-color: var(--spring-red);
+        }
+
+        .week-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .week-display {
+            min-width: 6rem;
+            text-align: center;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+        }
+
+        .current-week-badge {
+            background: var(--spring-red);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2em;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* 课程表网格 */
+        .timetable-grid {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .timetable-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .timetable-table th,
+        .timetable-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .timetable-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        .timetable-table th:first-child {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .time-cell {
+            font-size: 0.85rem;
+        }
+
+        .time-cell .node-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .time-cell .time-range {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .course-card {
+            background: color-mix(in srgb, var(--course-color, #666) 15%, transparent);
+            border-left: 4px solid var(--course-color, #666);
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .course-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .course-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+            word-break: break-word;
+        }
+
+        .course-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .course-info div {
+            margin-top: 0.15rem;
+        }
+
+        .empty-cell {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* 移动端列表视图 */
+        .mobile-timetable {
+            display: none;
+        }
+
+        .mobile-day-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .mobile-day-header {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-day-content {
+            padding: 1rem;
+        }
+
+        .mobile-course-card {
+            background: color-mix(in srgb, var(--course-color, #666) 15%, transparent);
+            border-left: 4px solid var(--course-color, #666);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .mobile-course-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .mobile-course-name {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-course-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .mobile-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+        }
+
+        /* 返回首页按钮 */
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            transition: all 0.2s ease;
+        }
+
+        .back-home:hover {
+            background: var(--bg-secondary);
+            border-color: var(--spring-red);
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            .timetable-container {
+                padding: 1rem;
+            }
+
+            .timetable-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .timetable-title {
+                font-size: 1.5rem;
+            }
+
+            .desktop-timetable {
+                display: none;
+            }
+
+            .mobile-timetable {
+                display: block;
+            }
+        }
+
+        /* 暗色模式适配 */
+        [data-theme="dark"] .course-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="timetable-container">
+            <div class="timetable-header">
+                <div>
+                    <h1 class="timetable-title" id="tableName">课程表</h1>
+                    <div class="timetable-meta">
+                        共 <span id="maxWeek">0</span> 周
+                        <span id="currentWeekBadge"></span>
+                    </div>
+                </div>
+                <a href="/" class="back-home">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 12H3l9-9l9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></g></svg>
+                    返回首页
+                </a>
+            </div>
+
+            <div class="week-selector">
+                <button class="week-btn" id="prevWeek" onclick="changeWeek(-1)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </button>
+                <span class="week-display">第 <span id="currentWeek">1</span> 周</span>
+                <button class="week-btn" id="nextWeek" onclick="changeWeek(1)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                    </svg>
+                </button>
+                <span id="isCurrentWeek"></span>
+            </div>
+
+            <!-- 桌面端网格视图 -->
+            <div class="desktop-timetable" style="margin-top: 1.5rem;">
+                <div class="timetable-grid">
+                    <table class="timetable-table">
+                        <thead>
+                            <tr id="tableHeader">
+                                <th>节次</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 移动端列表视图 -->
+            <div class="mobile-timetable" style="margin-top: 1.5rem;">
+                <div id="mobileContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    © 2026 Moretti. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 课程表数据
+        let timetableData = null;
+        let currentWeek = 1;
+        let actualCurrentWeek = 1;
+
+        const WEEKDAY_LABELS = {
+            1: '周一',
+            2: '周二',
+            3: '周三',
+            4: '周四',
+            5: '周五',
+            6: '周六',
+            7: '周日'
+        };
+
+        // 从URL获取周次
+        function getWeekFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const week = parseInt(params.get('week'));
+            return week && week > 0 ? week : null;
+        }
+
+        // 更新URL
+        function updateUrl(week) {
+            const url = new URL(window.location);
+            url.searchParams.set('week', week);
+            window.history.replaceState({}, '', url);
+        }
+
+        // 解析颜色
+        function parseColor(rawColor) {
+            if (!rawColor) return null;
+            // 处理 #ffrrggbb 格式
+            if (rawColor.startsWith('#') && rawColor.length === 9) {
+                return '#' + rawColor.slice(3);
+            }
+            return rawColor;
+        }
+
+        // 生成课程颜色
+        function generateCourseColor(courseName, courseId) {
+            const seed = courseName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + courseId;
+            const hue = seed % 360;
+            return `hsl(${hue} 78% 68%)`;
+        }
+
+        // 解析日期
+        function parseDate(ymd) {
+            const parts = ymd.split('-').map(Number);
+            if (parts.length !== 3) return null;
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        // 计算当前周
+        function calculateCurrentWeek(startDate, maxWeek) {
+            const start = parseDate(startDate);
+            if (!start) return 1;
+
+            const now = new Date();
+            const diffDays = Math.floor((now - start) / (24 * 60 * 60 * 1000));
+            const week = Math.floor(diffDays / 7) + 1;
+
+            return Math.max(1, Math.min(week, maxWeek));
+        }
+
+        // 判断是否显示周末
+        function shouldShowWeekend(week, weekendDisplay) {
+            if (!weekendDisplay || !weekendDisplay.enabled) {
+                return { sat: false, sun: false };
+            }
+
+            const showSat = weekendDisplay.days.includes('sat') && weekendDisplay.weeks.includes(week);
+            const showSun = weekendDisplay.days.includes('sun') && weekendDisplay.weeks.includes(week);
+
+            return { sat: showSat, sun: showSun };
+        }
+
+        // 获取要显示的星期列
+        function getDayColumns(settings, week) {
+            const columns = [
+                { day: 1, label: WEEKDAY_LABELS[1] },
+                { day: 2, label: WEEKDAY_LABELS[2] },
+                { day: 3, label: WEEKDAY_LABELS[3] },
+                { day: 4, label: WEEKDAY_LABELS[4] },
+                { day: 5, label: WEEKDAY_LABELS[5] }
+            ];
+
+            const weekendDisplay = settings.weekendDisplay;
+
+            // 如果启用了 weekendDisplay，优先使用它的配置
+            if (weekendDisplay && weekendDisplay.enabled) {
+                const { sat, sun } = shouldShowWeekend(week, weekendDisplay);
+                if (sat) {
+                    columns.push({ day: 6, label: WEEKDAY_LABELS[6] });
+                }
+                if (sun) {
+                    columns.push({ day: 7, label: WEEKDAY_LABELS[7] });
+                }
+            } else {
+                // 否则使用传统的 showSat/showSun 配置
+                if (settings.showSat) {
+                    columns.push({ day: 6, label: WEEKDAY_LABELS[6] });
+                }
+                if (settings.showSun) {
+                    columns.push({ day: 7, label: WEEKDAY_LABELS[7] });
+                }
+            }
+
+            return columns;
+        }
+
+        // 构建课程视图
+        function buildCourseView(schedule, course, nodeTimes) {
+            const startNode = schedule.startNode;
+            const step = schedule.step;
+            const endNode = Math.min(startNode + step - 1, nodeTimes.length);
+
+            const startTime = nodeTimes.find(n => n.node === startNode)?.startTime || '--:--';
+            const endTime = nodeTimes.find(n => n.node === endNode)?.endTime || '--:--';
+
+            const color = parseColor(course?.color) || generateCourseColor(course?.courseName || '', schedule.id);
+
+            return {
+                courseId: schedule.id,
+                courseName: course?.courseName || `课程 #${schedule.id}`,
+                color: color,
+                teacher: schedule.teacher?.trim() || '未填写',
+                room: schedule.room?.trim() || '未填写',
+                day: schedule.day,
+                startNode: startNode,
+                endNode: endNode,
+                startWeek: schedule.startWeek,
+                endWeek: schedule.endWeek,
+                timeText: `${startTime} - ${endTime}`
+            };
+        }
+
+        // 获取当前周的课程
+        function getWeekCourses(week) {
+            const settings = timetableData.settings;
+            const nodeTimes = timetableData.timeTable;
+            const courses = timetableData.courses;
+            const schedules = timetableData.schedules;
+
+            const dayColumns = getDayColumns(settings, week);
+            const coursesByDay = {};
+
+            dayColumns.forEach(col => {
+                coursesByDay[col.day] = [];
+            });
+
+            schedules.forEach(schedule => {
+                if (week < schedule.startWeek || week > schedule.endWeek) return;
+                if (!(schedule.day in coursesByDay)) return;
+
+                const course = courses.find(c => c.id === schedule.id);
+                const courseView = buildCourseView(schedule, course, nodeTimes);
+                coursesByDay[schedule.day].push(courseView);
+            });
+
+            // 按节次排序
+            Object.keys(coursesByDay).forEach(day => {
+                coursesByDay[day].sort((a, b) => a.startNode - b.startNode);
+            });
+
+            return { dayColumns, coursesByDay, nodeTimes };
+        }
+
+        // 渲染桌面端表格
+        function renderDesktopTable(week) {
+            const { dayColumns, coursesByDay, nodeTimes } = getWeekCourses(week);
+            const settings = timetableData.settings;
+
+            // 渲染表头
+            const headerRow = document.getElementById('tableHeader');
+            headerRow.innerHTML = '<th>节次</th>';
+            dayColumns.forEach(col => {
+                headerRow.innerHTML += `<th>${col.label}</th>`;
+            });
+
+            // 渲染表格内容 - 每两节一行
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            const nodes = settings.nodes || 11;
+            for (let node = 1; node <= nodes; node += 2) {
+                const endNode = Math.min(node + 1, nodes);
+                const startTime = nodeTimes.find(n => n.node === node)?.startTime || '--:--';
+                const endTime = nodeTimes.find(n => n.node === endNode)?.endTime || '--:--';
+
+                const row = document.createElement('tr');
+
+                // 时间列
+                row.innerHTML = `
+                    <td class="time-cell">
+                        <div class="node-label">第 ${node}-${endNode} 节</div>
+                        <div class="time-range">${startTime} - ${endTime}</div>
+                    </td>
+                `;
+
+                // 每天的课程
+                dayColumns.forEach(col => {
+                    // 获取在当前行节次范围内显示的课程
+                    const dayCourses = coursesByDay[col.day].filter(c => {
+                        // 课程与当前行有重叠：课程开始 <= 行结束 且 课程结束 >= 行开始
+                        return c.startNode <= endNode && c.endNode >= node;
+                    });
+
+                    if (dayCourses.length > 0) {
+                        let coursesHtml = '<td>';
+                        dayCourses.forEach(course => {
+                            // 在当前行显示课程（课程起始在当前行范围内，或跨行显示）
+                            const courseStartInRow = course.startNode >= node && course.startNode <= endNode;
+                            const courseSpansRow = course.startNode < node && course.endNode >= node;
+                            if (courseStartInRow || courseSpansRow) {
+                                coursesHtml += `
+                                    <div class="course-card" style="--course-color: ${course.color}">
+                                        <div class="course-name">${course.courseName}</div>
+                                        <div class="course-info">
+                                            <div>${course.startWeek}-${course.endWeek}周</div>
+                                            <div>教室：${course.room}</div>
+                                            <div>教师：${course.teacher}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+                        coursesHtml += '</td>';
+                        row.innerHTML += coursesHtml;
+                    } else {
+                        row.innerHTML += '<td class="empty-cell">—</td>';
+                    }
+                });
+
+                tbody.appendChild(row);
+            }
+        }
+
+        // 渲染移动端视图
+        function renderMobileView(week) {
+            const { dayColumns, coursesByDay, nodeTimes } = getWeekCourses(week);
+            const container = document.getElementById('mobileContent');
+            container.innerHTML = '';
+
+            dayColumns.forEach(col => {
+                const dayCourses = coursesByDay[col.day];
+
+                const dayCard = document.createElement('div');
+                dayCard.className = 'mobile-day-card';
+
+                let coursesHtml = '';
+                if (dayCourses.length > 0) {
+                    dayCourses.forEach(course => {
+                        coursesHtml += `
+                            <div class="mobile-course-card" style="--course-color: ${course.color}">
+                                <div class="mobile-course-name">${course.courseName}</div>
+                                <div class="mobile-course-info">
+                                    <div>时间：${course.timeText}</div>
+                                    <div>周次：${course.startWeek}-${course.endWeek}周</div>
+                                    <div>教室：${course.room}</div>
+                                    <div>教师：${course.teacher}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    coursesHtml = '<div class="mobile-empty">本周暂无课程</div>';
+                }
+
+                dayCard.innerHTML = `
+                    <div class="mobile-day-header">${col.label}</div>
+                    <div class="mobile-day-content">${coursesHtml}</div>
+                `;
+
+                container.appendChild(dayCard);
+            });
+        }
+
+        // 更新UI
+        function updateUI() {
+            document.getElementById('currentWeek').textContent = currentWeek;
+            document.getElementById('prevWeek').disabled = currentWeek <= 1;
+            document.getElementById('nextWeek').disabled = currentWeek >= timetableData.settings.maxWeek;
+
+            // 当前周标记
+            const isCurrentWeek = currentWeek === actualCurrentWeek;
+            document.getElementById('isCurrentWeek').innerHTML = isCurrentWeek
+                ? '<span class="current-week-badge">当前周</span>'
+                : '';
+
+            renderDesktopTable(currentWeek);
+            renderMobileView(currentWeek);
+            updateUrl(currentWeek);
+        }
+
+        // 切换周次
+        function changeWeek(delta) {
+            const newWeek = currentWeek + delta;
+            if (newWeek >= 1 && newWeek <= timetableData.settings.maxWeek) {
+                currentWeek = newWeek;
+                updateUI();
+            }
+        }
+
+        // 加载课程表数据
+        async function loadTimetable() {
+            try {
+                const response = await fetch('/大三下.json');
+                timetableData = await response.json();
+
+                const settings = timetableData.settings;
+
+                // 设置标题
+                document.getElementById('tableName').textContent = settings.tableName || '课程表';
+                document.getElementById('maxWeek').textContent = settings.maxWeek || 20;
+
+                // 计算当前周
+                actualCurrentWeek = calculateCurrentWeek(settings.startDate, settings.maxWeek);
+
+                // 从URL获取周次或使用当前周
+                currentWeek = getWeekFromUrl() || actualCurrentWeek;
+
+                updateUI();
+            } catch (error) {
+                console.error('加载课程表失败:', error);
+                document.getElementById('tableBody').innerHTML = `
+                    <tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        加载课程表失败，请刷新页面重试
+                    </td></tr>
+                `;
+            }
+        }
+
+        // 主题切换
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadTimetable();
+        });
+    </script>
+</body>
+</html>

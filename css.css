@@ -247,6 +247,69 @@ body {
 .repo-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
+}
+
+/* 课程表状态卡片 */
+.timetable-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin: 1rem 0;
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.timetable-card:hover {
+    border-color: var(--spring-red);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .timetable-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.timetable-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.timetable-card-content {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.timetable-status-header {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.timetable-status-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.timetable-status-line {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.timetable-status-bold {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.repo-card {
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
@@ -813,6 +876,20 @@ body {
         font-size: 14px;
     }
 
+    /* 移动端课程表卡片适配 */
+    .timetable-card {
+        margin: 0.75rem 0;
+        padding: 0.75rem;
+    }
+
+    .timetable-status-header {
+        font-size: 13px;
+    }
+
+    .timetable-status-line {
+        font-size: 12px;
+    }
+
     .pinned-project .repo-description {
         font-size: 12px;
         margin-bottom: 10px;
@@ -849,7 +926,7 @@ body {
         width: 12px;
         height: 12px;
     }
-    
+
     /* 调整tab-container位置，让它往上移动 */
     .tab-container {
         margin-top: -1.5rem;
@@ -5272,6 +5349,144 @@ margin-left: auto; /* 保持靠右 */
 }
 
 
+
+/* ============================================
+   Friends Tab 切换样式
+   ============================================ */
+
+.friends-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 4px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.friends-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.friends-tab:hover {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.friends-tab.active {
+    background-color: var(--card-bg);
+    color: var(--link-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.friends-tab svg {
+    opacity: 0.7;
+}
+
+.friends-tab.active svg {
+    opacity: 1;
+}
+
+.friends-content-wrapper {
+    min-height: 200px;
+}
+
+/* 朋友圈适配样式 */
+#friend-circle-lite-root {
+    --fcl-bg-color: var(--card-bg);
+    --fcl-text-color: var(--text-color);
+    --fcl-border-color: var(--border-color);
+    --fcl-link-color: var(--link-color);
+}
+
+/* 修复朋友圈卡片标题截断问题 */
+#friend-circle-lite-root .card-title,
+#friend-circle-lite-root .fcl-card-title,
+#friend-circle-lite-root .fcl-article-title,
+#friend-circle-lite-root a[class*="title"] {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.4 !important;
+    max-height: 2.8em !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+}
+
+/* 确保卡片内容区域不会被截断 */
+#friend-circle-lite-root .card,
+#friend-circle-lite-root .fcl-card,
+#friend-circle-lite-root .fcl-article-card {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+/* 修复卡片文字内容 */
+#friend-circle-lite-root .card-content,
+#friend-circle-lite-root .fcl-card-content,
+#friend-circle-lite-root .fcl-article-content {
+    overflow: visible !important;
+}
+
+[data-theme="dark"] #friend-circle-lite-root {
+    --fcl-bg-color: var(--card-bg);
+    --fcl-text-color: var(--text-color);
+    --fcl-border-color: var(--border-color);
+    --fcl-link-color: var(--link-color);
+}
+
+/* 暗色模式下的 Friends Tab */
+[data-theme="dark"] .friends-tabs {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .friends-tab {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .friends-tab:hover {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .friends-tab.active {
+    background-color: var(--card-bg);
+    color: var(--link-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .friends-tabs {
+        gap: 4px;
+        padding: 3px;
+    }
+
+    .friends-tab {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .friends-tab svg {
+        width: 16px;
+        height: 16px;
+    }
+}
 
 /* 友情链接样式 */
 .friends-container {
