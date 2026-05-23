@@ -32,7 +32,7 @@ function normalizeLangName(name) {
 function getValidYears() {
   const currentYear = new Date().getFullYear();
   // 假设用户注册年份为 2020 年（可以根据实际情况调整）
-  const userRegistrationYear = 2023; // 可以改为实际的注册年份
+  const userRegistrationYear = 2026; // 可以改为实际的注册年份
   const validYears = [];
   for (let year = currentYear; year >= userRegistrationYear; year--) {
     validYears.push(year);
@@ -93,7 +93,7 @@ const ongoingProject = {
 const ENV = import.meta.env;
 
 // GitHub API配置
-const GITHUB_USERNAME = ENV.VITE_GITHUB_USERNAME || "Mroetti815";
+const GITHUB_USERNAME = ENV.VITE_GITHUB_USERNAME || "Moretti815";
 const GITHUB_API_BASE = "https://api.github.com";
 const GITHUB_TOKEN = ENV.VITE_GITHUB_TOKEN || "#";
 
@@ -205,7 +205,6 @@ async function fetchArticlesData() {
 
       const xmlText = await response.text();
       articles = parseRSS(xmlText);
-      console.log("RSS 解析结果:", articles);
     } else {
       // 原有 JSON API 处理
       const response = await fetch(ARTICLES_API_CONFIG.URL, {
@@ -219,7 +218,6 @@ async function fetchArticlesData() {
       }
 
       const data = await response.json();
-      console.log("API 返回的原始数据:", data);
       articles = data.rows || [];
     }
 
@@ -314,18 +312,15 @@ async function fetchLinkStatusData() {
 // 应用延迟状态标签到友链卡片
 function applyLinkStatusTags(linkStatusData) {
   if (!linkStatusData || !linkStatusData.link_status) {
-    console.log("No link status data available");
     return;
   }
 
   const linkStatus = linkStatusData.link_status;
-  console.log("Applying link status tags, total:", linkStatus.length);
 
   document.querySelectorAll(".friend-card").forEach((card) => {
     // 使用 data-link 属性或 href 属性
     const cardLink = card.dataset.link || card.href;
     if (!cardLink) {
-      console.log("Card has no link");
       return;
     }
 
@@ -335,20 +330,10 @@ function applyLinkStatusTags(linkStatusData) {
     };
 
     const normalizedCardLink = normalizeUrl(cardLink);
-    console.log("Looking for match:", normalizedCardLink);
 
     const status = linkStatus.find((item) => {
       const normalizedItemLink = normalizeUrl(item.link);
-      const match = normalizedItemLink === normalizedCardLink;
-      if (match) {
-        console.log(
-          "Found match:",
-          normalizedItemLink,
-          "latency:",
-          item.latency,
-        );
-      }
-      return match;
+      return normalizedItemLink === normalizedCardLink;
     });
 
     if (status) {
@@ -382,9 +367,6 @@ function applyLinkStatusTags(linkStatusData) {
 
       card.style.position = "relative";
       card.appendChild(statusTag);
-      console.log("Added status tag to card:", normalizedCardLink);
-    } else {
-      console.log("No status found for:", normalizedCardLink);
     }
   });
 }
@@ -553,16 +535,14 @@ async function fetchGitHubData() {
     // 忽略特定仓库
     repos = repos.filter(
       (repo) =>
-        repo.name !== "Mroetti815" &&
-        repo.full_name !== "Mroetti815/Mroetti815",
+        repo.name !== "Moretti815" &&
+        repo.full_name !== "Moretti815/Moretti815",
     );
 
     // 获取每个仓库的详细信息
     const repoDetails = await Promise.all(
       repos.map(async (repo) => {
         try {
-          console.log(`处理仓库: ${repo.name}`);
-
           const languagesResponse = await fetch(repo.languages_url, {
             headers: headers,
           });
@@ -571,11 +551,8 @@ async function fetchGitHubData() {
           // 验证仓库名称，避免特殊字符导致的API错误
           const repoName = repo.name.replace(/[^a-zA-Z0-9._-]/g, "");
           if (!repoName) {
-            console.warn(`跳过无效的仓库名称: ${repo.name}`);
             return null;
           }
-
-          console.log(`清理后的仓库名称: ${repoName}`);
 
           // 获取最近的提交
           let lastCommit = null;
@@ -591,13 +568,9 @@ async function fetchGitHubData() {
               const commits = await commitsResponse.json();
               lastCommit =
                 commits.length > 0 ? commits[0].commit.author.date : null;
-            } else {
-              console.warn(
-                `无法获取仓库 ${repoName} 的提交信息: ${commitsResponse.status} - ${commitsResponse.statusText}`,
-              );
             }
           } catch (commitError) {
-            console.warn(`获取仓库 ${repoName} 提交信息时出错:`, commitError);
+            // 忽略提交信息获取错误
           }
 
           return {
@@ -617,7 +590,6 @@ async function fetchGitHubData() {
             languages: languages,
           };
         } catch (error) {
-          console.error(`处理仓库 ${repo.name} 时出错:`, error);
           return null;
         }
       }),
@@ -848,9 +820,9 @@ async function fetchContributionData(
   forceRefresh = false,
 ) {
   try {
-    // 缓存键名
-    const cacheKey = `contribution_data_${year}`;
-    const cacheTimestampKey = `contribution_timestamp_${year}`;
+    // 缓存键名（临时修改强制刷新）
+    const cacheKey = `contribution_data_v5_${year}`;
+    const cacheTimestampKey = `contribution_timestamp_v3_${year}`;
 
     // 检查缓存是否有效（5分钟过期）
     const CACHE_DURATION = 5 * 60 * 1000; // 5分钟
@@ -862,7 +834,6 @@ async function fetchContributionData(
     if (!forceRefresh && cachedData && cachedTimestamp) {
       const cacheAge = now - parseInt(cachedTimestamp);
       if (cacheAge < CACHE_DURATION) {
-        console.log(`使用缓存的贡献数据 (${year})`);
         const parsedData = JSON.parse(cachedData);
         // 恢复Date对象
         parsedData.contributionData = parsedData.contributionData.map(
@@ -874,8 +845,6 @@ async function fetchContributionData(
         return parsedData;
       }
     }
-
-    console.log(`正在获取最新的贡献数据 (${year})...`);
 
     const headers = {
       Accept: "application/vnd.github.v3+json",
@@ -897,24 +866,24 @@ async function fetchContributionData(
       );
 
       if (!reposResponse.ok) {
-        console.warn("无法获取用户仓库列表，将只使用 Events API 数据");
         return [];
       }
 
       const repos = await reposResponse.json();
-      return repos.filter((repo) => !repo.fork); // 只获取非 fork 的仓库
+      return repos; // 返回所有仓库，包括 fork 的仓库
     }
 
     // 新增：获取指定仓库在指定时间范围内的 Commits
     async function getRepoCommits(repoName, since, until) {
       try {
+        // 只获取用户自己的 commits（author 参数）
+        // 注意：对于 fork 仓库，不应该获取原始仓库的所有 commits
         const commitsResponse = await fetch(
           `https://api.github.com/repos/${GITHUB_USERNAME}/${repoName}/commits?author=${GITHUB_USERNAME}&since=${since.toISOString()}&until=${until.toISOString()}&per_page=100`,
           { headers },
         );
 
         if (!commitsResponse.ok) {
-          console.warn(`无法获取仓库 ${repoName} 的 Commits`);
           return [];
         }
 
@@ -926,7 +895,6 @@ async function fetchContributionData(
           created_at: commit.commit.author.date,
         }));
       } catch (error) {
-        console.warn(`获取仓库 ${repoName} 的 Commits 时出错:`, error);
         return [];
       }
     }
@@ -940,7 +908,6 @@ async function fetchContributionData(
         );
 
         if (!starsResponse.ok) {
-          console.warn("无法获取用户的 Stars 数据");
           return [];
         }
 
@@ -959,7 +926,6 @@ async function fetchContributionData(
           owner: star.full_name.split("/")[0],
         }));
       } catch (error) {
-        console.warn("获取用户 Stars 数据时出错:", error);
         return [];
       }
     }
@@ -973,7 +939,6 @@ async function fetchContributionData(
         );
 
         if (!forksResponse.ok) {
-          console.warn("无法获取用户的 Forks 数据");
           return [];
         }
 
@@ -992,7 +957,6 @@ async function fetchContributionData(
           originalRepo: fork.source ? fork.source.full_name : null,
         }));
       } catch (error) {
-        console.warn("获取用户 Forks 数据时出错:", error);
         return [];
       }
     }
@@ -1016,9 +980,6 @@ async function fetchContributionData(
             if (!response.ok) {
               if (response.status === 422) {
                 // 422 表示没有更多页面了
-                console.log(
-                  `GitHub Events API 返回 422，停止获取 (page=${page})`,
-                );
                 hasMorePages = false;
                 break;
               }
@@ -1043,10 +1004,6 @@ async function fetchContributionData(
               page++;
             }
           } catch (error) {
-            console.warn(
-              `获取 GitHub Events 第 ${page} 页失败:`,
-              error.message,
-            );
             hasMorePages = false;
           }
         }
@@ -1063,26 +1020,37 @@ async function fetchContributionData(
       getUserForks(startDate, endDate),
     ]);
 
-    console.log(
-      `获取到 ${allEvents.length} 个GitHub事件，${userRepos.length} 个用户仓库，${allStars.length} 个 Stars，${allForks.length} 个 Forks`,
-    );
-
     // 对 Stars 和 Forks 按时间倒序排序，确保最新的在前面
     allStars.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     allForks.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     // 获取所有仓库的 Commits 数据
     const allCommits = [];
-    for (const repo of userRepos.slice(0, 10)) {
-      // 限制最多获取前10个仓库，避免API限制
-      const repoCommits = await getRepoCommits(repo.name, startDate, endDate);
+
+    // 从 PushEvent 中提取需要获取 commits 的仓库列表
+    const pushEventRepos = [
+      ...new Set(
+        allEvents
+          .filter((event) => event.type === "PushEvent")
+          .map((event) => event.repo.name.split("/")[1]),
+      ),
+    ];
+
+    // 合并用户仓库和 PushEvent 中的仓库，去重
+    const reposToFetch = [
+      ...new Set([
+        ...userRepos.slice(0, 15).map((r) => r.name),
+        ...pushEventRepos,
+      ]),
+    ];
+
+    for (const repoName of reposToFetch) {
+      const repoCommits = await getRepoCommits(repoName, startDate, endDate);
       allCommits.push(...repoCommits);
     }
 
     // 对 Commits 按时间倒序排序，确保最新的 Commits 在前面
     allCommits.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    console.log(`获取到 ${allCommits.length} 个 Commits`);
 
     // 处理事件数据，按日期分组
     const contributionsByDate = {};
@@ -1114,15 +1082,28 @@ async function fetchContributionData(
             contributionsByDate[dateStr] += commitCount;
 
             // 确保每个 PushEvent 都会创建活动记录，即使 commitCount 为 0
-            console.log(
-              `处理 PushEvent: ${event.repo.name}, commits: ${commitCount}`,
-            );
 
             // 获取提交信息
             const commits = event.payload.commits || [];
-            const commitMessages = commits
+            let commitMessages = commits
               .map((commit) => commit.message)
               .slice(0, 3); // 只取前3个提交信息
+
+            // 如果 Events API 没有返回 commit 信息，尝试从 Commits API 数据中补充
+            if (commitMessages.length === 0) {
+              const repoName = event.repo.name.split("/")[1];
+
+              // 从 allCommits 中查找同一仓库的 commits（放宽日期匹配，因为 commit 时间和 push 时间可能不同）
+              const matchingCommits = allCommits.filter(
+                (commit) => commit.repo === repoName,
+              );
+
+              if (matchingCommits.length > 0) {
+                commitMessages = matchingCommits
+                  .map((commit) => commit.commit.message)
+                  .slice(0, 3);
+              }
+            }
 
             activitiesByMonth[monthStr].push({
               type: "commit",
@@ -1310,16 +1291,10 @@ async function fetchContributionData(
         // 增加贡献计数
         contributionsByDate[dateStr] += 1;
 
-        // 检查是否已经存在相同仓库和日期的 commit 活动
+        // 检查是否已经存在相同仓库的 commit 活动（放宽日期匹配，因为 commit 时间和 push 时间可能不同）
         const existingActivity = activitiesByMonth[monthStr].find(
           (activity) =>
-            activity.type === "commit" &&
-            activity.repo === commit.repo &&
-            activity.date ===
-              commitDate.toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-              }),
+            activity.type === "commit" && activity.repo === commit.repo,
         );
 
         if (!existingActivity) {
@@ -1527,12 +1502,6 @@ async function fetchContributionData(
     localStorage.setItem(cacheKey, JSON.stringify(result));
     localStorage.setItem(cacheTimestampKey, now.toString());
 
-    // 输出调试信息
-    console.log(`贡献数据已缓存 (${year})`);
-    console.log(
-      `总贡献数: ${data.reduce((sum, day) => sum + day.contributions, 0)}`,
-    );
-
     // 统计各类型活动
     const activityStats = {};
     Object.values(activitiesByMonth).forEach((monthActivities) => {
@@ -1540,26 +1509,6 @@ async function fetchContributionData(
         activityStats[activity.type] = (activityStats[activity.type] || 0) + 1;
       });
     });
-    console.log("活动类型统计:", activityStats);
-
-    // 输出最新的几个活动用于调试
-    console.log("最新的活动:");
-    Object.keys(activitiesByMonth)
-      .slice(0, 2)
-      .forEach((month) => {
-        const monthActivities = activitiesByMonth[month];
-        if (monthActivities.length > 0) {
-          console.log(
-            `${month}:`,
-            monthActivities.slice(0, 3).map((a) => ({
-              type: a.type,
-              repo: a.repo,
-              date: a.date,
-              description: a.description,
-            })),
-          );
-        }
-      });
 
     return result;
   } catch (error) {
@@ -1616,19 +1565,6 @@ async function checkContributionUpdates() {
 
           // 如果最新事件时间晚于缓存时间，说明有新活动
           if (latestEventTime > cacheTime) {
-            console.log("检测到新的GitHub活动，需要更新贡献数据");
-            console.log("最新活动类型:", events[0].type);
-
-            // 特别检查是否有新的提交活动
-            const hasNewCommits = events.some((event) => {
-              const eventTime = new Date(event.created_at).getTime();
-              return event.type === "PushEvent" && eventTime > cacheTime;
-            });
-
-            if (hasNewCommits) {
-              console.log("检测到新的提交活动，优先更新贡献数据");
-            }
-
             return true;
           }
         }
@@ -1660,8 +1596,6 @@ async function refreshContributionData() {
     const currentYear = new Date().getFullYear();
     const yearToRefresh = savedYear ? parseInt(savedYear) : currentYear;
 
-    console.log("手动刷新贡献数据...", yearToRefresh);
-
     // 清除所有相关的缓存，强制重新获取数据
     const cacheKey = `contribution_data_${yearToRefresh}`;
     const cacheTimestampKey = `contribution_timestamp_${yearToRefresh}`;
@@ -1679,7 +1613,6 @@ async function refreshContributionData() {
           key.startsWith("contribution_timestamp_"))
       ) {
         localStorage.removeItem(key);
-        console.log("清除缓存:", key);
       }
     }
 
@@ -1704,6 +1637,9 @@ async function refreshContributionData() {
     }
   }
 }
+
+// 将函数挂载到全局，以便 HTML 中的 onclick 可以调用
+window.refreshContributionData = refreshContributionData;
 
 // 添加更新贡献显示的辅助函数
 async function updateContributionDisplay(data, activityData, year) {
@@ -2435,18 +2371,6 @@ function calculateCodeReviewStats(activityData) {
   );
   const reviewsPercentage = Math.round((totalReviews / totalCount) * 100);
 
-  console.log("代码审查统计:", {
-    totalCommits,
-    totalIssues,
-    totalPullRequests,
-    totalReviews,
-    totalCount,
-    commitsPercentage,
-    issuesPercentage,
-    pullRequestsPercentage,
-    reviewsPercentage,
-  });
-
   return {
     commitsPercentage,
     issuesPercentage,
@@ -2676,6 +2600,9 @@ async function updateContributionYear(year, forceRefresh = false) {
   }
 }
 
+// 将函数挂载到全局，以便 HTML 中的 onchange 可以调用
+window.updateContributionYear = updateContributionYear;
+
 // 修改渲染概览页面的函数
 async function renderOverview() {
   const content = document.querySelector(".content-area");
@@ -2703,8 +2630,8 @@ async function renderOverview() {
     const mostRecentRepo = repoDetails.find(
       (repo) =>
         !repo.is_fork &&
-        repo.name !== "Mroetti815" &&
-        repo.full_name !== "Mroetti815/Mroetti815",
+        repo.name !== "Moretti815" &&
+        repo.full_name !== "Moretti815/Moretti815",
     );
 
     // 为最新项目添加标识
@@ -3150,16 +3077,9 @@ async function fetchProjectDetail(projectName) {
       );
       if (commitsResponse.ok) {
         commits = await commitsResponse.json();
-      } else {
-        console.warn(
-          `无法获取仓库 ${cleanOwner}/${cleanRepo} 的提交信息: ${commitsResponse.status}`,
-        );
       }
     } catch (commitError) {
-      console.warn(
-        `获取仓库 ${cleanOwner}/${cleanRepo} 提交信息时出错:`,
-        commitError,
-      );
+      // 忽略提交信息获取错误
     }
 
     // 获取README内容
@@ -3175,7 +3095,7 @@ async function fetchProjectDetail(projectName) {
         readme = decodeURIComponent(escape(atob(readmeData.content)));
       }
     } catch (error) {
-      console.log("No README found");
+      // README 不存在或获取失败
     }
 
     return {
@@ -3943,7 +3863,6 @@ function forceRefreshAllPageCache() {
   Object.keys(pageCacheStatus).forEach((pageType) => {
     pageCacheStatus[pageType] = false;
   });
-  console.log("已重置所有页面的缓存状态");
 }
 
 // ============================================
@@ -4358,7 +4277,6 @@ function startContributionUpdateChecker() {
       if (!document.hidden) {
         const needsUpdate = await checkContributionUpdates();
         if (needsUpdate) {
-          console.log("检测到新活动，自动更新贡献数据");
           // 强制刷新概览页面的缓存状态
           forceRefreshPageCache("overview");
           await refreshContributionData();
@@ -4374,7 +4292,6 @@ function startContributionUpdateChecker() {
       // 页面变为可见时检查更新
       const needsUpdate = await checkContributionUpdates();
       if (needsUpdate) {
-        console.log("页面重新可见，检测到新活动，自动更新贡献数据");
         // 强制刷新概览页面的缓存状态
         forceRefreshPageCache("overview");
         await refreshContributionData();
@@ -4395,8 +4312,6 @@ async function fetchMemosData() {
         ? `${MEMOS_API_BASE}/memos?pageToken=${nextPageToken}`
         : `${MEMOS_API_BASE}/memos`;
 
-      console.log(`正在获取memo数据: ${url}`);
-
       const response = await fetch(url, {
         headers: {
           Accept: "application/json",
@@ -4411,15 +4326,12 @@ async function fetchMemosData() {
       const data = await response.json();
       const memos = data.memos || [];
 
-      console.log(`本页获取到 ${memos.length} 个memo`);
       allMemos.push(...memos);
 
       // 获取下一页的token
       nextPageToken = data.nextPageToken;
-      console.log(`下一页token: ${nextPageToken}`);
     } while (nextPageToken);
 
-    console.log(`总共获取到 ${allMemos.length} 个memo`);
     return allMemos;
   } catch (error) {
     console.error("Error fetching Memos data:", error);
@@ -4973,7 +4885,6 @@ async function renderArticles() {
 
   try {
     const articles = await fetchArticlesData();
-    console.log("渲染文章时接收到的文章数据:", articles); // 添加日志
 
     if (articles && articles.length > 0) {
       let articlesContentHTML = `<div class="articles-grid">`;
@@ -5021,7 +4932,6 @@ async function renderArticles() {
           const articleId = card.dataset.articleId;
           const article = articles.find((a) => a.id == articleId);
           if (article) {
-            console.log("点击文章卡片时:", article); // 添加日志
             showArticleDetail(article);
           }
         });
@@ -5035,7 +4945,6 @@ async function renderArticles() {
         );
       }
     } else {
-      console.log("articles 数组为空或无效，显示暂无文章可显示。"); // 添加日志
       contentArea.innerHTML = `
             <div class="blankslate">
                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -5109,7 +5018,6 @@ function loadMoreArticles(articles) {
         const articleId = card.dataset.articleId;
         const article = articles.find((a) => a.id == articleId);
         if (article) {
-          console.log("点击文章卡片时:", article); // 添加日志
           showArticleDetail(article);
         }
       });
@@ -5698,9 +5606,8 @@ function showChangelog() {
   }
 }
 
-// 添加全局调试函数，用于手动清除所有贡献数据缓存
+// 添加全局函数，用于手动清除所有贡献数据缓存
 window.clearContributionCache = function () {
-  console.log("清除所有贡献数据缓存...");
   let clearedCount = 0;
 
   for (let i = 0; i < localStorage.length; i++) {
@@ -5711,18 +5618,15 @@ window.clearContributionCache = function () {
         key.startsWith("contribution_timestamp_"))
     ) {
       localStorage.removeItem(key);
-      console.log("清除缓存:", key);
       clearedCount++;
     }
   }
 
-  console.log(`共清除 ${clearedCount} 个缓存项`);
   alert(`已清除 ${clearedCount} 个贡献数据缓存项，请刷新页面`);
 };
 
-// 添加全局调试函数，用于查看当前缓存状态
+// 添加全局函数，用于查看当前缓存状态
 window.showContributionCache = function () {
-  console.log("当前贡献数据缓存状态:");
   let cacheCount = 0;
 
   for (let i = 0; i < localStorage.length; i++) {
@@ -5732,13 +5636,11 @@ window.showContributionCache = function () {
       (key.startsWith("contribution_data_") ||
         key.startsWith("contribution_timestamp_"))
     ) {
-      const value = localStorage.getItem(key);
-      console.log(`${key}:`, value ? "有数据" : "空");
       cacheCount++;
     }
   }
 
-  console.log(`共有 ${cacheCount} 个贡献数据缓存项`);
+  alert(`共有 ${cacheCount} 个贡献数据缓存项`);
 };
 
 // 2. renderActivityTimeline 里，月份头部显示格式化
@@ -5964,3 +5866,6 @@ function toggleCommitMessages(toggleElement, remainingCount) {
     toggleElement.classList.remove("expanded");
   }
 }
+
+// 将函数挂载到全局，以便 HTML 中的 onclick 可以调用
+window.toggleCommitMessages = toggleCommitMessages;
