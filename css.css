@@ -787,6 +787,11 @@ body {
         width: 100%;
     }
 
+    .social-link {
+        white-space: nowrap;
+        overflow: visible;
+    }
+
     .language-tag {
         font-size: 11px;
         padding: 1px 5px;
@@ -862,6 +867,11 @@ body {
 
     .social-links {
         gap: 0.5rem;
+    }
+
+    .social-link {
+        white-space: nowrap;
+        overflow: visible;
     }
 
     body {
@@ -1006,6 +1016,12 @@ body {
     .social-links {
         gap: 0.35rem;
         font-size: 12px;
+    }
+
+    .social-link {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: visible;
     }
 
     .stats {
@@ -7882,6 +7898,91 @@ margin-left: auto; /* 保持靠右 */
 .wechat-popup a:hover {
     color: #fff;
     text-decoration: none;
+}
+
+/* Guide Page Styles */
+.guide-container {
+    max-width: 100%;
+}
+
+.guide-category {
+    margin-bottom: 2rem;
+}
+
+.guide-category h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.guide-category a {
+    display: block;
+    padding: 1.25rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.guide-category a:last-child {
+    border-bottom: none;
+}
+
+.guide-category a:hover {
+    background-color: var(--bg-secondary);
+}
+
+.guide-category a .flex {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.guide-category a img,
+.guide-category img {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    max-width: 1.5rem !important;
+    max-height: 1.5rem !important;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.guide-category a span {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: color 0.2s ease;
+}
+
+.guide-category a:hover span {
+    color: var(--link-color);
+}
+
+.guide-category a p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-left: 2.25rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Guide responsive styles */
+@media (max-width: 768px) {
+    .guide-container {
+        padding: 1rem;
+    }
+
+    .guide-category a {
+        padding: 1rem;
+    }
+
+    .guide-category a p {
+        margin-left: 2rem;
+    }
 }
 
 [data-theme="light"] .wechat-popup a {

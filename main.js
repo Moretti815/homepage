@@ -3169,6 +3169,100 @@ async function renderStars() {
   }
 }
 
+// 渲染导航页面
+async function renderGuide() {
+  const content = document.querySelector(".content-area");
+
+  // 显示加载中
+  showSkeletonLoading("guide");
+
+  try {
+    // 更新到下一步：获取导航数据
+    await updateLoadingStep();
+
+    const response = await fetch("/guide.json");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch guide data: ${response.status}`);
+    }
+    const guideData = await response.json();
+
+    // 更新到下一步：渲染导航内容
+    await updateLoadingStep();
+
+    // 构建分类 HTML
+    const categoriesHtml = guideData.categories
+      .map((category) => {
+        const itemsHtml = category.items
+          .map(
+            (item) => `
+        <a
+          href="${item.url}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group block p-5 hover:bg-[var(--bg-secondary)] transition-all border-b border-[var(--border-color)] last:border-b-0"
+        >
+          <div class="flex items-center gap-3 mb-1">
+            <img
+              src="${item.icon}"
+              alt=""
+              class="w-6 h-6"
+              onerror="this.style.display='none'"
+            />
+            <span class="text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)] transition">${item.title}</span>
+          </div>
+          <p class="text-sm text-[var(--text-secondary)] ml-9">${item.description}</p>
+        </a>
+      `,
+          )
+          .join("");
+
+        return `
+        <div class="guide-category mb-8">
+          <h2 class="text-xl font-bold text-[var(--text-color)] mb-4 pb-2 border-b border-[var(--border-color)]">
+            ${category.name}
+          </h2>
+          <div class="space-y-0 border border-[var(--border-color)] rounded-lg overflow-hidden">
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
+      })
+      .join("");
+
+    content.innerHTML = `
+      <div class="guide-container p-6 md:p-8">
+        <div class="flex items-center gap-2 mb-6">
+          <svg class="guide-header-icon" style="width: 1.75rem; height: 1.75rem; color: var(--link-color); flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          </svg>
+          <h1 class="text-2xl font-bold text-[var(--text-color)]">${guideData.title}</h1>
+        </div>
+        <p class="text-sm text-[var(--text-secondary)] mb-8 leading-relaxed">
+          ${guideData.description}
+        </p>
+        ${categoriesHtml}
+      </div>
+    `;
+
+    // 更新到最后一步：完成加载
+    await updateLoadingStep();
+  } catch (error) {
+    console.error("Error rendering guide:", error);
+    content.innerHTML = `
+      <div class="blankslate">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <h3>加载失败</h3>
+        <p>无法加载导航数据，请稍后重试</p>
+      </div>
+    `;
+  } finally {
+    // 隐藏加载中
+    await hideSkeletonLoading();
+  }
+}
+
 // 添加获取项目详情的函数
 async function fetchProjectDetail(projectName) {
   try {
@@ -4264,6 +4358,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       case "changelog":
         await renderChangelog();
         break;
+      case "guide":
+        await renderGuide();
+        break;
       default:
         await fetchGitHubData();
         await renderOverview();
@@ -4324,6 +4421,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             break;
           case "changelog":
             await renderChangelog();
+            break;
+          case "guide":
+            await renderGuide();
             break;
           default:
             await fetchGitHubData();

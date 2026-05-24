@@ -1,0 +1,42 @@
+{
+  "title": "导航",
+  "description": "我的网站导航",
+  "icon": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/moretti.webp",
+  "categories": [
+    {
+      "name": "我的网站",
+      "items": [
+        {
+          "title": "GitHub Gmeek",
+          "description": "基于Github issues的博客自用",
+          "url": "https://s.2005815.xyz/blog",
+          "icon": "https://wsrv.nl/?url=github.com/Meekdai.png"
+        },
+        {
+          "title": "Cloudflare Shortlinks",
+          "description": "基于Cloudflare Pages的短链服务",
+          "url": "https://s.2005815.xyz",
+          "icon": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/ShortiLink.webp"
+        },
+        {
+          "title": "BroadcastChannel",
+          "description": "telegram频道说说",
+          "url": "https://s.2005815.xyz/memos",
+          "icon": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/memos.webp"
+        },
+        {
+          "title": "Gmemp",
+          "description": "基于Github的音乐播放器",
+          "url": "https://s.2005815.xyz/music",
+          "icon": "https://img.wkds.eu.org/link/xNOcvpR9"
+        },
+        {
+          "title": "Gallery",
+          "description": "基于Github的画廊",
+          "url": "https://s.2005815.xyz/gallery",
+          "icon": "https://img.wkds.eu.org/link/xNOcvpR9"
+        }
+      ]
+    }
+  ]
+}
