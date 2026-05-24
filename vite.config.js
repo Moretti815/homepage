@@ -29,6 +29,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        timetable: resolve(__dirname, 'timetable.html'),
+        reward: resolve(__dirname, 'reward/index.html'),
       },
       // 外部依赖（不打包这些库，保持 CDN 加载）
       external: [],
