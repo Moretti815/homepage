@@ -245,7 +245,7 @@ async function fetchArticlesData() {
 async function fetchFriendsData() {
   try {
     const response = await fetch(
-      "https://jsd.268682.xyz/gh/Kemeow0815/friends@output/v2/data.json",
+      "https://jsd.liiiu.cn/gh/Kemeow0815/friends@output/v2/data.json",
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch friends data: ${response.status}`);
@@ -3263,6 +3263,169 @@ async function renderGuide() {
   }
 }
 
+// 渲染留言板页面
+async function renderMessage() {
+  const content = document.querySelector(".content-area");
+
+  // 显示加载中
+  showSkeletonLoading("message");
+
+  try {
+    // 更新到下一步：获取留言板数据
+    await updateLoadingStep();
+
+    const response = await fetch("/message.json");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch message data: ${response.status}`);
+    }
+    const messageData = await response.json();
+
+    // 更新到下一步：渲染留言板内容
+    await updateLoadingStep();
+
+    // 构建规则列表 HTML
+    const rulesHtml = messageData.notice.rules
+      .map(
+        (rule) => `
+      <li>
+        <strong>${rule.title}</strong>
+        <span>${rule.content}</span>
+      </li>
+    `,
+      )
+      .join("");
+
+    // 构建徽章 HTML
+    const badgesHtml = messageData.badges
+      .map(
+        (badge) => `
+      <span class="message-badge">${badge}</span>
+    `,
+      )
+      .join("");
+
+    content.innerHTML = `
+      <div class="message-container">
+        <!-- 头部区域 -->
+        <section class="message-hero">
+          <div class="message-hero-content">
+            <h1 class="message-title">${messageData.title}</h1>
+            <p class="message-subtitle">${messageData.subtitle}</p>
+            <p class="message-description">${messageData.description}</p>
+            <div class="message-badges">
+              ${badgesHtml}
+            </div>
+          </div>
+          <div class="message-quote">
+            <span>"${messageData.quote}"</span>
+          </div>
+        </section>
+
+        <!-- 介绍区域 -->
+        <section class="message-intro">
+          <div class="message-intro-main">
+            <div class="message-kicker">${messageData.intro.kicker}</div>
+            <h2>${messageData.intro.title}</h2>
+            ${messageData.intro.paragraphs.map((p) => `<p>${p}</p>`).join("")}
+          </div>
+        </section>
+
+        <!-- 规范提示 -->
+        <section class="message-notice">
+          <div class="notice-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <details class="notice-details">
+            <summary class="notice-summary">${messageData.notice.title}</summary>
+            <div class="notice-content">
+              <ol>${rulesHtml}</ol>
+              <div class="notice-warn">${messageData.notice.warning}</div>
+            </div>
+          </details>
+        </section>
+
+        <!-- Giscus 评论区域 -->
+        <section class="message-comments">
+          <div class="giscus-container"></div>
+        </section>
+      </div>
+    `;
+
+    // 加载 Giscus 评论
+    loadGiscus();
+
+    // 更新到最后一步：完成加载
+    await updateLoadingStep();
+  } catch (error) {
+    console.error("Error rendering message:", error);
+    content.innerHTML = `
+      <div class="blankslate">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <h3>加载失败</h3>
+        <p>无法加载留言板数据，请稍后重试</p>
+      </div>
+    `;
+  } finally {
+    // 隐藏加载中
+    await hideSkeletonLoading();
+  }
+}
+
+// 加载 Giscus 评论
+function loadGiscus() {
+  // 获取当前主题
+  const currentTheme =
+    document.documentElement.getAttribute("data-theme") || "light";
+  const giscusTheme = currentTheme === "dark" ? "dark" : "light";
+
+  // 创建 Giscus 脚本
+  const script = document.createElement("script");
+  script.src = "https://giscus.app/client.js";
+  script.setAttribute("data-repo", "Moretti815/homepage");
+  script.setAttribute("data-repo-id", "R_kgDOSkv5lg");
+  script.setAttribute("data-category", "Announcements");
+  script.setAttribute("data-category-id", "DIC_kwDOSkv5ls4C9zVM");
+  script.setAttribute("data-mapping", "pathname");
+  script.setAttribute("data-strict", "1");
+  script.setAttribute("data-reactions-enabled", "1");
+  script.setAttribute("data-emit-metadata", "0");
+  script.setAttribute("data-input-position", "top");
+  script.setAttribute("data-theme", giscusTheme);
+  script.setAttribute("data-lang", "zh-CN");
+  script.setAttribute("data-loading", "lazy");
+  script.setAttribute("crossorigin", "anonymous");
+  script.async = true;
+
+  // 添加到容器
+  const container = document.querySelector(".giscus-container");
+  if (container) {
+    container.appendChild(script);
+  }
+}
+
+// 更新 Giscus 主题
+function updateGiscusTheme(theme) {
+  const iframe = document.querySelector("iframe.giscus-frame");
+  if (iframe) {
+    iframe.contentWindow.postMessage(
+      {
+        giscus: {
+          setConfig: {
+            theme: theme === "dark" ? "dark" : "light",
+          },
+        },
+      },
+      "https://giscus.app",
+    );
+  }
+}
+
 // 添加获取项目详情的函数
 async function fetchProjectDetail(projectName) {
   try {
@@ -4011,6 +4174,8 @@ let pageCacheStatus = {
   articles: false,
   changelog: false,
   friends: false,
+  guide: false,
+  message: false,
 };
 
 // 已移除分步骤加载映射与缓存步骤，统一显示简单的加载状态
@@ -4361,6 +4526,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       case "guide":
         await renderGuide();
         break;
+      case "message":
+        await renderMessage();
+        break;
       default:
         await fetchGitHubData();
         await renderOverview();
@@ -4425,6 +4593,9 @@ document.addEventListener("DOMContentLoaded", async function () {
           case "guide":
             await renderGuide();
             break;
+          case "message":
+            await renderMessage();
+            break;
           default:
             await fetchGitHubData();
             await renderOverview();
@@ -4469,6 +4640,11 @@ function toggleTheme() {
   // 同步更新朋友圈主题
   if (typeof applyFriendCircleTheme === "function") {
     applyFriendCircleTheme();
+  }
+
+  // 同步更新 Giscus 评论主题
+  if (typeof updateGiscusTheme === "function") {
+    updateGiscusTheme(newTheme);
   }
 }
 
