@@ -19,7 +19,7 @@ async function loadSponsorsData() {
   try {
     // 尝试从远程加载数据
     const response = await fetch(
-      "https://jsd.liiiu.cn/gh/Kemeow0815/sponsors@main/data/sponsors/sponsors.json",
+      "https://cdn.jsdmirror.com/gh/Kemeow0815/sponsors@main/data/sponsors/sponsors.json",
     );
     if (response.ok) {
       const data = await response.json();
