@@ -245,7 +245,7 @@ async function fetchArticlesData() {
 async function fetchFriendsData() {
   try {
     const response = await fetch(
-      "https://jsd.liiiu.cn/gh/Kemeow0815/friends@output/v2/data.json",
+      "https://cdn.jsdmirror.com/gh/Kemeow0815/friends@output/v2/data.json",
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch friends data: ${response.status}`);
